@@ -13,7 +13,7 @@ Use [leiningen](https://github.com/technomancy/leiningen) to build project
 
 		lein jar
 
-And there will be a file named "control-x.x-snapshot.jar" at project directory.Then use as a standard jar by adding it to your classpath.
+And there will be a file named "control-0.1-SNAPSHOT.jar" at project directory.Then use as a standard jar by adding it to your classpath.
 
 ##Getting started
 
@@ -35,11 +35,11 @@ Get the current date from the two machines listed in the 'mycluster' config with
 
 If saved in a file named "controls.clj",run with
    		
-		java -cp clojure.jar:clojure-contrib.jar:control-0.1-snapshot.jar controls.clj mycluster date
+		java -cp clojure.jar:clojure-contrib.jar:control-0.1-SNAPSHOT.jar controls.clj mycluster date
 
-I have created it in samples directory,you can run it by [lein-exec](https://github.com/kumarshantanu/lein-exec) plugin
+I have created this file in project's samples directory,you can modify and run it by [lein-exec](https://github.com/kumarshantanu/lein-exec) plugin
 
-  	    lein exec samples/controls.clj
+  	    lein exec samples/controls.cl mycluster datej
 
 Each machine execute "date" command ,and the output form the remote machine is printed to the console.Exmaple console output
 
