@@ -1,4 +1,4 @@
 (defproject control "0.1-SNAPSHOT"
-  :description "Scripted system admin and deployment for many remote machines with clojure"
+  :description "A clojure DSL for system admin and deployment with many remote machines"
   :dependencies [[org.clojure/clojure "1.2.0"]
 				 [org.clojure/clojure-contrib "1.2.0"]])
