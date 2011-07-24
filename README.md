@@ -24,15 +24,18 @@ Get the current date from the two machines listed in the 'mycluster' config with
 		(ns samples
 		  (:use [control.core :only [task cluster scp ssh begin]]))
 
+		;;define clusters
 		(cluster :mycluster
 		 :clients [
 				   { :host "a.domain.com" :user "alogin"}
 				   { :host "b.domain.com" :user "blogin"}
 				   ])
 
+		;;define tasks			   
 	    (task :date "Get date"
 	     (ssh "date"))
 
+		;;start running
 		(begin)
 
 If saved in a file named "controls.clj",run with
