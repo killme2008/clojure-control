@@ -15,7 +15,7 @@
 	  (ssh "date"))
 
 (task :deploy "scp files to remote machines"
-	  (scp "release.tar.gz" "/home/alogin/"))
+	  (scp ("release.tar.gz") "/home/alogin/"))
 
 
 (begin)
