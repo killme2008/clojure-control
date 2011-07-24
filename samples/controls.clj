@@ -14,4 +14,8 @@
 (task :date "Get date"
 	  (ssh "date"))
 
+(task :deploy "scp files to remote machines"
+	  (scp "release.tar.gz" "/home/alogin/"))
+
+
 (begin)
