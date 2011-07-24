@@ -37,7 +37,11 @@ Get the current date from the two machines listed in the 'mycluster' config with
 
 If saved in a file named "controls.clj",run with
    		
-		java -cp clojure.jar:clojure-contrib.jar:control-0.1-SNAPSHOT.jar controls.clj mycluster date
+		java -cp clojure.jar:clojure-contrib.jar:control-0.1-SNAPSHOT.jar clojure.main controls.clj mycluster date
+
+If you have a script to start clojure,it can be started simply
+   
+		clojure controls.clj mycluster date
 
 Each machine execute "date" command ,and the output form the remote machine is printed to the console.Exmaple console output
 

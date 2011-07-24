@@ -57,8 +57,8 @@
 
 (defmacro scp
   [host user files remoteDir]
-  (display host "scp" (str files " ==> " remoteDir))
-  `(exec ~host ~user ["scp" ~@files (str (client ~host ~user) ":"  ~remoteDir)]))
+  `(display ~host "scp" (str ~files " ==> " ~remoteDir))
+  (exec ~host ~user ["scp" ~@files (str (client ~host ~user) ":"  ~remoteDir)]))
 
 
 
