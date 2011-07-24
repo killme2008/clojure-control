@@ -6,6 +6,15 @@ Clojure-control depends only on OpenSSH and clojure on the local control machine
 
 The idea came from [node-control](https://github.com/tsmith/node-control).
 
+##Installation
+
+Clone this repository with git or download the latest version using the GitHub repository Downloads link.
+Use [leiningen](https://github.com/technomancy/leiningen) to build project
+
+		lein jar
+
+And there will be a file named "control-x.x-snapshot.jar" at project directory.Then use as a standard jar by adding it to your classpath.
+
 ##Getting started
 
 Get the current date from the two machines listed in the 'mycluster' config with a single command:
@@ -26,7 +35,11 @@ Get the current date from the two machines listed in the 'mycluster' config with
 
 If saved in a file named "controls.clj",run with
    		
-		clojure controls.clj mycluster date
+		java -cp clojure.jar:clojure-contrib.jar:control-0.1-snapshot.jar controls.clj mycluster date
+
+I have created it in samples directory,you can run it by [lein-exec](https://github.com/kumarshantanu/lein-exec) plugin
+
+  	    lein exec samples/controls.clj
 
 Each machine execute "date" command ,and the output form the remote machine is printed to the console.Exmaple console output
 
