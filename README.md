@@ -59,7 +59,7 @@ We defined a new task named "deploy" to copy release.tar.gz to remote machine's 
 ## Define clusters
 
 As you seen the example in GettingStarted,you could use cluster macro to define cluster making remote machines in a group.
-If your machines have the same user,you can use cluster macro more simple
+If your machines have the same user,you can use cluster macro more simply
 
    		(cluster :mycluster
 				 :user "login"
@@ -74,7 +74,7 @@ Also,you can configure :clients for special machines:
 				  :user "login"	
 				  :addresses ["a.domain.com" "b.domain.com"])
 
-Then clojure-control will use clogin with c.domain.com,but use login with a.domain.com and b.domain.com.
+Then clojure-control will use "clogin" to login c.domain.com,but use "login" to login a.domain.com and b.domain.com.
 
 
 
