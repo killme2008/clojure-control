@@ -15,6 +15,8 @@ Use [leiningen](https://github.com/technomancy/leiningen) to build project
 
 And there will be a file named "control-0.1-SNAPSHOT.jar" at project directory.Then use as a standard jar by adding it to your classpath.
 
+Or you can just add src/control/core.clj to your classpath.
+
 ##Getting started
 
 Get the current date from the two machines listed in the 'mycluster' config with a single command:
