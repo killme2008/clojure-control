@@ -30,11 +30,14 @@
 	(.close in)
 	(.close err)
 	(.waitFor process)))
+(defn gen-log
+  [host tag content]
+  (str host ":" tag ": " content))
 
 (defn log-with-tag
   [host tag content]
   (if (not (blank? (str content)))
-	(println (str host ":" tag ": " content))))
+	(println (gen-log host tag content))))
 
 (defn exec
   [host user cmdcol]
@@ -45,20 +48,20 @@
 	(log-with-tag host "stderr" (:stderr execp))
 	(log-with-tag host "exit" status)))
 
-(defn client
+(defn ssh-client
   [host user]
   (str user "@" host))
 
 (defn ssh
   [host user cmd]
   (log-with-tag host "ssh" cmd)
-  (exec host user ["ssh" (client host user) cmd])) 
+  (exec host user ["ssh" (ssh-client host user) cmd])) 
 
 
 (defmacro scp
   [host user files remoteDir]
-  `(do (log-with-tag ~host "scp" (str ~@files " ==> " ~remoteDir))
-	   (exec ~host ~user ["scp" ~@files (str (client ~host ~user) ":"  ~remoteDir)])))
+  `(do (log-with-tag ~host "scp" (join " " (list ~@files  " ==> " ~remoteDir)))
+	   (exec ~host ~user ["scp" ~@files (str (ssh-client ~host ~user) ":"  ~remoteDir)])))
 
 
 
@@ -81,7 +84,7 @@
 (defmacro cluster
   [name & args]
   `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
-	 (assoc! clusters ~name (assoc m# :name name))))
+	 (assoc! clusters ~name (assoc m# :name ~name))))
 
 (defmacro when-exit
   ([test error] `(when-exit ~test ~error nil))
