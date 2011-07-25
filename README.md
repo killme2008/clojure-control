@@ -33,7 +33,8 @@ Get the current date from the two machines listed in the 'mycluster' config with
 
 		;;define tasks			   
 	    (task :date "Get date"
-	     (ssh "date"))
+		 	  []
+			  (ssh "date"))
 
 		;;start running
 		(begin)
@@ -68,6 +69,7 @@ as well as the final exit code of the local ssh command.
 If you want to scp files to remote machines,you could use scp function
    
       (task :deploy "scp files to remote machines"
+	        []
    	  		(scp ("release1.tar.gz" "release2.tar.gz") "/home/alogin/"))
 
 We defined a new task named "deploy" to copy release1.tar.gz and release2.tar.gz to remote machine's /home/alogin directory.
@@ -95,7 +97,19 @@ Also,you can configure :clients for special machines:
 Then clojure-control will use "clogin" to login c.domain.com,but use "login" to login a.domain.com and b.domain.com.
 
 
+##Pass arguments to task
 
+As you seen,define task using a argument vector to pass arguments for task.For example,i want to scp special file to remote machines,then
+
+   	    (task :deploy "deploy a file to remote machine"
+			  [file]
+			  (scp (file) "/home/login"))
+
+Run with
+
+	 	clojure controls.clj mycluster deploy release.tar.gz
+
+Then "release.tar.gz" in command line arguments would be passed to scp macro as "file" argument,then copy it to remote machines.
 
 
 

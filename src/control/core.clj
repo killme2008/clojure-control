@@ -31,7 +31,7 @@
 	(.close err)
 	(.waitFor process)))
 
-(defn- display
+(defn log-with-tag
   [host tag content]
   (if (not (blank? (str content)))
 	(println (str host ":" tag ": " content))))
@@ -41,9 +41,9 @@
   (let [pagent (spawn host (into-array String cmdcol))
 		status (await-process pagent)
 		execp @pagent]
-	(display host "stdout" (:stdout execp))
-	(display host "stderr" (:stderr execp))
-	(display host "exit" status)))
+	(log-with-tag host "stdout" (:stdout execp))
+	(log-with-tag host "stderr" (:stderr execp))
+	(log-with-tag host "exit" status)))
 
 (defn client
   [host user]
@@ -51,14 +51,14 @@
 
 (defn ssh
   [host user cmd]
-  (display host "ssh" cmd)
+  (log-with-tag host "ssh" cmd)
   (exec host user ["ssh" (client host user) cmd])) 
 
 
 (defmacro scp
   [host user files remoteDir]
-  `(display ~host "scp" (str ~files " ==> " ~remoteDir))
-  `(exec ~host ~user ["scp" ~@files (str (client ~host ~user) ":"  ~remoteDir)]))
+  `(do (log-with-tag ~host "scp" (str ~@files " ==> " ~remoteDir))
+	   (exec ~host ~user ["scp" ~@files (str (client ~host ~user) ":"  ~remoteDir)])))
 
 
 
@@ -66,9 +66,9 @@
 (defvar clusters (transient (hash-map)))
 
 (defmacro task
-  [name desc & body]
-  (let [new-body (map #(concat (list (first %) 'host 'user) (rest %)) body)]
-	`(assoc! tasks ~name ~(list 'fn '[host user] (cons 'do new-body)))))
+  [name desc arguments & body]
+ (let [new-body (map #(concat (list (first %) 'host 'user) (rest %)) body)]
+	`(assoc! tasks ~name ~(list 'fn (vec (concat '[host user] arguments)) (cons 'do new-body)))))
 
 (defn- unquote-cluster [args]
   (walk (fn [item]
@@ -91,10 +91,13 @@
 		~else)))
 
 (defn- perform
-  [host user task taskName]
+  [host user task taskName arguments]
   (do
 	(println (str "Performing " (name taskName) " for " host))
-	(task host user)))
+	(apply task host user arguments)))
+
+(defn- arg-count [f] (let [m (first (.getDeclaredMethods (class f))) p (.getParameterTypes m)] (alength p)))
+
 
 (defn begin
   []
@@ -102,6 +105,7 @@
 			 "Please offer cluster and task name"
 			 (let [clusterName (keyword (first *command-line-args*))
 				   taskName (keyword (second *command-line-args*))
+				   args (next (next *command-line-args*))
 				   cluster (clusterName clusters)
 				   user (:user cluster)
 				   addresses (:addresses cluster)
@@ -109,9 +113,10 @@
 				   task (taskName tasks)]
 			   (when-exit (nil? task) (str "No task named " (name taskName)))
 			   (when-exit (and (empty? addresses)  (empty? clients)) (str "Empty clients for cluster " (name clusterName)))
+			   (let [expect-count (- (arg-count task) 2)]
+				 (when-exit (not= expect-count (count args)) (str "Task " (name taskName) " just needs " expect-count " arguments")))
 			   (do
 				 (println  (str "Performing " (name clusterName)))
-				 (dorun (map #(perform % user task taskName) addresses))
-				 (dorun (map #(perform (:host %) (:user %) task taskName) clients))
+				 (dorun (map #(perform % user task taskName args) addresses))
+				 (dorun (map #(perform (:host %) (:user %) task taskName args) clients))
 				 (shutdown-agents)))))
-

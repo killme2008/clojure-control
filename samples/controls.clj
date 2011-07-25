@@ -14,10 +14,12 @@
 
 ;;define tasks
 (task :date "Get date"
+	  []
 	  (ssh "date"))
 
 (task :deploy "scp files to remote machines"
-	  (scp ("release.tar.gz") "/home/alogin/"))
+	  [file1 file2]
+	  (scp (file1 file2) "/home/alogin/"))
 
 ;;start running
 (begin)
