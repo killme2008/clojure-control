@@ -10,7 +10,7 @@
 (defstruct ExecProcess :process :in :err :stdout :stderr)
   
 (defn- spawn
-  [host cmdarray]
+  [cmdarray]
   (let [process (.exec *runtime* cmdarray)
 		in (reader (.getInputStream process) :encoding "UTF-8")
 		err (reader (.getErrorStream process) :encoding "UTF-8")
@@ -41,7 +41,7 @@
 
 (defn exec
   [host user cmdcol]
-  (let [pagent (spawn host (into-array String cmdcol))
+  (let [pagent (spawn (into-array String cmdcol))
 		status (await-process pagent)
 		execp @pagent]
 	(log-with-tag host "stdout" (:stdout execp))
