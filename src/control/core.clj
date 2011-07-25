@@ -65,13 +65,13 @@
 
 
 
-(defvar tasks (transient (hash-map)))
-(defvar clusters (transient (hash-map)))
+(defvar tasks (atom (hash-map)))
+(defvar clusters (atom (hash-map)))
 
 (defmacro task
   [name desc arguments & body]
  (let [new-body (map #(concat (list (first %) 'host 'user) (rest %)) body)]
-	`(assoc! tasks ~name ~(list 'fn (vec (concat '[host user] arguments)) (cons 'do new-body)))))
+	`(swap! tasks assoc ~name ~(list 'fn (vec (concat '[host user] arguments)) (cons 'do new-body)))))
 
 (defn- unquote-cluster [args]
   (walk (fn [item]
@@ -84,7 +84,7 @@
 (defmacro cluster
   [name & args]
   `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
-	 (assoc! clusters ~name (assoc m# :name ~name))))
+	 (swap! clusters assoc ~name (assoc m# :name ~name))))
 
 (defmacro when-exit
   ([test error] `(when-exit ~test ~error nil))
@@ -109,11 +109,11 @@
 			 (let [clusterName (keyword (first *command-line-args*))
 				   taskName (keyword (second *command-line-args*))
 				   args (next (next *command-line-args*))
-				   cluster (clusterName clusters)
+				   cluster (clusterName @clusters)
 				   user (:user cluster)
 				   addresses (:addresses cluster)
 				   clients (:clients cluster)
-				   task (taskName tasks)]
+				   task (taskName @tasks)]
 			   (when-exit (nil? task) (str "No task named " (name taskName)))
 			   (when-exit (and (empty? addresses)  (empty? clients)) (str "Empty clients for cluster " (name clusterName)))
 			   (let [expect-count (- (arg-count task) 2)]
