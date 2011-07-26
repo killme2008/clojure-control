@@ -8,7 +8,7 @@
 (defvar- *runtime* (Runtime/getRuntime))
 
 (defstruct ExecProcess :process :in :err :stdout :stderr)
-  
+
 (defn- spawn
   [cmdarray]
   (let [process (.exec *runtime* cmdarray)
@@ -70,7 +70,7 @@
 
 (defmacro task
   [name desc arguments & body]
- (let [new-body (map #(concat (list (first %) 'host 'user) (rest %)) body)]
+  (let [new-body (map #(concat (list (first %) 'host 'user) (rest %)) body)]
 	`(swap! tasks assoc ~name ~(list 'fn (vec (concat '[host user] arguments)) (cons 'do new-body)))))
 
 (defn- unquote-cluster [args]
