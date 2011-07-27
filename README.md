@@ -19,7 +19,7 @@ Use [leiningen](https://github.com/technomancy/leiningen) to build project
 
 		lein jar
 
-And there will be a file named "control-0.1.0.jar" at project directory.Then use as a standard jar by adding it to your classpath.
+And there will be a file named "control-0.2.0.jar" at project directory.Then use as a standard jar by adding it to your classpath.
 
 Or you can just add src/control/core.clj to your classpath.
 
