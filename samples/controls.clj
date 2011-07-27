@@ -19,7 +19,7 @@
 
 (deftask :deploy "scp files to remote machines"
 	  [file1 file2]
-	  (scp (file1 file2) "/home/alogin/"))
+	  (scp [file1 file2] "/home/alogin/"))
 
 ;;start running
 (begin)
