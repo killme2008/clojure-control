@@ -118,7 +118,13 @@ Run with
 Then "release.tar.gz" in command line arguments would be passed to scp macro as "file" argument,then copy it to remote machines.
 
 
+##Contributors
 
+[sunng87](https://github.com/sunng87)  
+
+##Lein plugin
+
+[lein-control](https://github.com/sunng87/lein-control) by sunny87
 				
 
 
