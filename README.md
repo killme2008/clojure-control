@@ -10,7 +10,7 @@ The idea came from [node-control](https://github.com/tsmith/node-control).
 
 To include clojure-control,add:
 
-   		 [control "0.1.0"]
+   		 [control "0.2.0"]
 
 ##Build
 
@@ -28,17 +28,17 @@ Or you can just add src/control/core.clj to your classpath.
 Get the current date from the two machines listed in the 'mycluster' config with a single command:
 
 		(ns samples
-		  (:use [control.core :only [task cluster scp ssh begin]]))
+		  (:use [control.core :only [deftask defcluster scp ssh begin]]))
 
 		;;define clusters
-		(cluster :mycluster
+		(defcluster :mycluster
 		 :clients [
 				   { :host "a.domain.com" :user "alogin"}
 				   { :host "b.domain.com" :user "blogin"}
 				   ])
 
 		;;define tasks			   
-	    (task :date "Get date"
+	    (deftask :date "Get date"
 		 	  []
 			  (ssh "date"))
 
@@ -47,7 +47,7 @@ Get the current date from the two machines listed in the 'mycluster' config with
 
 If saved in a file named "controls.clj",run with
    		
-		java -cp clojure.jar:clojure-contrib.jar:control-0.1-SNAPSHOT.jar clojure.main controls.clj mycluster date
+		java -cp clojure.jar:clojure-contrib.jar:control-0.2.0.jar clojure.main controls.clj mycluster date
 
 If you have a script to start clojure,it can be started simply
    
@@ -74,9 +74,9 @@ as well as the final exit code of the local ssh command.
 
 If you want to scp files to remote machines,you could use scp function
    
-      (task :deploy "scp files to remote machines"
+      (deftask :deploy "scp files to remote machines"
 	        []
-   	  		(scp ("release1.tar.gz" "release2.tar.gz") "/home/alogin/"))
+   	  		(scp ["release1.tar.gz" "release2.tar.gz"] "/home/alogin/"))
 
 We defined a new task named "deploy" to copy release1.tar.gz and release2.tar.gz to remote machine's /home/alogin directory.
 
@@ -87,13 +87,13 @@ We defined a new task named "deploy" to copy release1.tar.gz and release2.tar.gz
 As you seen the example in GettingStarted,you could use cluster macro to define cluster making remote machines in a group.
 If your machines have the same user,you can use cluster macro more simply
 
-   		(cluster :mycluster
+   		(defcluster :mycluster
 				 :user "login"
 				 :addresses ["a.domain.com" "b.domain.com"])
 
 Also,you can configure :clients for special machines:
 
-		 (cluster :mycluster
+		 (defcluster :mycluster
 		 		  :clients [
 				 		   { :host "c.domain.com" :user "clogin"}
 				 		   ]
@@ -107,9 +107,9 @@ Then clojure-control will use "clogin" to login c.domain.com,but use "login" to 
 
 As you seen,define task using a argument vector to pass arguments for task.For example,i want to scp special file to remote machines,then
 
-   	    (task :deploy "deploy a file to remote machine"
+   	    (deftask :deploy "deploy a file to remote machine"
 			  [file]
-			  (scp (file) "/home/login"))
+			  (scp [file] "/home/login"))
 
 Run with
 
