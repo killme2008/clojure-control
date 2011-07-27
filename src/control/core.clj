@@ -68,7 +68,7 @@
 (defvar tasks (atom (hash-map)))
 (defvar clusters (atom (hash-map)))
 
-(defmacro task
+(defmacro deftask
   [name desc arguments & body]
   (let [new-body (map #(concat (list (first %) 'host 'user) (rest %)) body)]
 	`(swap! tasks assoc ~name ~(list 'fn (vec (concat '[host user] arguments)) (cons 'do new-body)))))
@@ -81,7 +81,7 @@
         identity
         args))
 
-(defmacro cluster
+(defmacro defcluster
   [name & args]
   `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
 	 (swap! clusters assoc ~name (assoc m# :name ~name))))
@@ -101,25 +101,28 @@
 
 (defn- arg-count [f] (let [m (first (.getDeclaredMethods (class f))) p (.getParameterTypes m)] (alength p)))
 
+(defn do-begin [args]
+  (let [clusterName (keyword (first args))
+    taskName (keyword (second args))
+    args (next (next args))
+    cluster (clusterName @clusters)
+    user (:user cluster)
+    addresses (:addresses cluster)
+    clients (:clients cluster)
+    task (taskName @tasks)]
+      (when-exit (nil? task) (str "No task named " (name taskName)))
+      (when-exit (and (empty? addresses)  (empty? clients)) (str "Empty clients for cluster " (name clusterName)))
+      (let [expect-count (- (arg-count task) 2)]
+      (when-exit (not= expect-count (count args)) (str "Task " (name taskName) " just needs " expect-count " arguments")))
+        (do
+          (println  (str "Performing " (name clusterName)))
+            (dorun (map #(perform % user task taskName args) addresses))
+            (dorun (map #(perform (:host %) (:user %) task taskName args) clients))
+              (shutdown-agents))))
+  
 
 (defn begin
   []
   (when-exit (or (nil? *command-line-args*) (< (count *command-line-args*) 2))
 			 "Please offer cluster and task name"
-			 (let [clusterName (keyword (first *command-line-args*))
-				   taskName (keyword (second *command-line-args*))
-				   args (next (next *command-line-args*))
-				   cluster (clusterName @clusters)
-				   user (:user cluster)
-				   addresses (:addresses cluster)
-				   clients (:clients cluster)
-				   task (taskName @tasks)]
-			   (when-exit (nil? task) (str "No task named " (name taskName)))
-			   (when-exit (and (empty? addresses)  (empty? clients)) (str "Empty clients for cluster " (name clusterName)))
-			   (let [expect-count (- (arg-count task) 2)]
-				 (when-exit (not= expect-count (count args)) (str "Task " (name taskName) " just needs " expect-count " arguments")))
-			   (do
-				 (println  (str "Performing " (name clusterName)))
-				 (dorun (map #(perform % user task taskName args) addresses))
-				 (dorun (map #(perform (:host %) (:user %) task taskName args) clients))
-				 (shutdown-agents)))))
+			 (do-begin *command-line-args*)))

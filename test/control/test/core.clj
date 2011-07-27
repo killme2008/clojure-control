@@ -24,7 +24,7 @@
 
 (deftest test-task
   (is (= 0 (count @tasks)))
-  (task :test "test task"
+  (deftask :test "test task"
 		[]
 		(+ 1 2))
   (is (= 1 (count @tasks)))
@@ -36,7 +36,7 @@
 
 (deftest test-cluster
   (is (= 0 (count @clusters)))
-  (cluster :mycluster
+  (defcluster :mycluster
 		   :clients [{:host "a.domain.com" :user "apple"}]
 		   :addresses ["a.com" "b.com"]
 		   :user "dennis"
@@ -57,7 +57,7 @@
 
 (with-private-fns [control.core [perform spawn await-process]]
   (deftest test-perform
-	(task :test "test-task"
+	(deftask :test "test-task"
 		  [a b]
 		  (+ a b))
 	(let [t (:test @tasks)]
