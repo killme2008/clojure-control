@@ -19,7 +19,9 @@
 
 (deftask :deploy "scp files to remote machines"
 	  [file1 file2]
-	  (scp [file1 file2] "/home/alogin/"))
+	  (scp [file1 file2] "/home/alogin/")
+	  (ssh (str "tar zxvf " file1))
+	  (ssh (str "tar zxvf " file2)))
 
 ;;start running
 (begin)

@@ -109,13 +109,14 @@ As you seen,define task using a argument vector to pass arguments for task.For e
 
    	    (deftask :deploy "deploy a file to remote machine"
 			  [file]
-			  (scp [file] "/home/login"))
+			  (scp [file] "/home/login")
+			  (ssh (str "tar zxvf " file)))
 
 Run with
 
 	 	clojure controls.clj mycluster deploy release.tar.gz
 
-Then "release.tar.gz" in command line arguments would be passed to scp macro as "file" argument,then copy it to remote machines.
+Then "release.tar.gz" in command line arguments would be passed to scp macro as "file" argument,then copy it to remote machines and decompress it.
 
 
 ##Contributors
