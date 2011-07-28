@@ -84,8 +84,8 @@ We defined a new task named "deploy" to copy release1.tar.gz and release2.tar.gz
    
 ## Define clusters
 
-As you seen the example in GettingStarted,you could use cluster macro to define cluster making remote machines in a group.
-If your machines have the same user,you can use cluster macro more simply
+As you seen the example in GettingStarted,you could use defcluster macro to define cluster making remote machines in a group.
+If your machines have the same user,you can use defcluster macro more simply
 
    		(defcluster :mycluster
 				 :user "login"
