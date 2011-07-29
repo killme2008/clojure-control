@@ -124,6 +124,7 @@ Inspired by [Fabric](http://docs.fabfile.org/en/1.2.0/api/core/context_managers.
 
 Change directory then execute some command:
 
+    (use [control.commands])
     (cd "/home/login"
         (run "ls"))
 
