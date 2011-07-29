@@ -118,6 +118,67 @@ Run with
 
 Then "release.tar.gz" in command line arguments would be passed to scp macro as "file" argument,then copy it to remote machines and decompress it.
 
+##Shell command DSL
+
+Inspired by [Fabric](http://docs.fabfile.org/en/1.2.0/api/core/context_managers.html "fabric"), a set of shell context DSL are provided for your convenience.
+
+Change directory then execute some command:
+
+    (cd "/home/login"
+        (run "ls"))
+
+It would be executed as:
+
+    cd /home/login; ls; 
+
+cd could be combine to execute multiple commands:
+
+    (cd "/home/login"
+        (run "ls")
+        (cd "bin"
+            (run "ls")))
+
+The result:
+
+    cd /home/login; ls; cd bin; ls; 
+
+Modify PATH:
+
+    (cd "/home/login"
+        (path "/home/login/bin"
+            (run "clojure")))
+
+The result:
+
+    cd /home/login; export PATH=/home/login/bin:$PATH; clojure; 
+
+Add environ variable for a command:
+
+    (cd "/home/login"
+        (path "/home/login/bin"
+            (env "JAVA_OPTS" "-XMaxPermSize=128m"
+                (run "clojure"))))
+    
+The result:
+
+    cd /home/login; export PATH=/home/login/bin:$PATH; JAVA_OPTS=-XMaxPermSize=128m clojure; 
+
+Ensure some prerequisite for some command:
+
+    (prefix "source bin/activate"
+        (run "pip install jip"))
+
+The result:
+
+    source bin/activate && pip install jip
+
+Run command with sudo:
+
+    (sudo "service tomcat start")
+
+Will work as:
+
+    sudo service tomcat start; 
 
 ##Contributors
 
