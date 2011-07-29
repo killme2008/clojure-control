@@ -24,3 +24,7 @@
         (cd "/home/sun"
           (prefix "source ~/.bash_profile"
             (run "ls"))))))
+
+(deftest test-sudo
+  (is (= "sudo service tomcat start; "
+        (sudo "service tomcat start"))))

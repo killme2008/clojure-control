@@ -27,3 +27,10 @@
   "simply run a command"
   [cmd]
   `(str ~cmd "; "))
+
+(defmacro sudo
+  "run a command with sudo"
+  [cmd]
+  `(str "sudo " ~cmd "; "))
+
+                            
