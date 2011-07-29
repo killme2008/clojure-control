@@ -121,6 +121,7 @@ Then "release.tar.gz" in command line arguments would be passed to scp macro as 
 ##Shell command DSL
 
 Inspired by [Fabric](http://docs.fabfile.org/en/1.2.0/api/core/context_managers.html "fabric"), a set of shell context DSL are provided for your convenience.
+You can use these macros in your ssh task.
 
 Change directory then execute some command:
 
