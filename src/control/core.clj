@@ -58,12 +58,12 @@
   (exec host user ["ssh" (ssh-client host user) cmd]))
 
 
-(defmacro scp
+(defn scp
   [host user files remoteDir]
-  `(do (log-with-tag ~host "scp"
-         (join " " (concat ~files [ " ==> " ~remoteDir])))
-       (exec ~host ~user ["scp" ~@files (str (ssh-client ~host ~user) ":"
-                                             ~remoteDir)])))
+  (log-with-tag host "scp"
+    (join " " (concat files [ " ==> " remoteDir])))
+  (exec host user
+        (concat ["scp"] files [(str (ssh-client host user) ":" remoteDir)])))
 
 
 
