@@ -16,7 +16,7 @@
 		err (reader (.getErrorStream process) :encoding "UTF-8")
 		execp (struct ExecProcess process in err)
 		pagent (agent execp)]
-	(send-off pagent (fn [exec-process] (assoc exec-process :stdout (str (:stdout exec-process) (join "\r\n" (doall (line-seq in))))))) 
+	(send-off pagent (fn [exec-process] (assoc exec-process :stdout (str (:stdout exec-process) (join "\r\n" (doall (line-seq in)))))))
 	(send-off pagent (fn [exec-process] (assoc exec-process :stderr (str (:stderr exec-process) (join "\r\n" (doall (line-seq err)))))))
 	pagent))
 
@@ -55,13 +55,15 @@
 (defn ssh
   [host user cmd]
   (log-with-tag host "ssh" cmd)
-  (exec host user ["ssh" (ssh-client host user) cmd])) 
+  (exec host user ["ssh" (ssh-client host user) cmd]))
 
 
 (defmacro scp
   [host user files remoteDir]
-  `(do (log-with-tag ~host "scp" (join " " (list ~@files  " ==> " ~remoteDir)))
-	   (exec ~host ~user ["scp" ~@files (str (ssh-client ~host ~user) ":"  ~remoteDir)])))
+  `(do (log-with-tag ~host "scp"
+         (join " " (concat ~files [ " ==> " ~remoteDir])))
+       (exec ~host ~user ["scp" ~@files (str (ssh-client ~host ~user) ":"
+                                             ~remoteDir)])))
 
 
 
