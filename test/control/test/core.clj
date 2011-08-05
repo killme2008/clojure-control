@@ -48,7 +48,7 @@
 	(is (= [{:host "a.domain.com" :user "apple"}] (:clients m)))
 	(is (= "dennis" (:user m)))
 	(is (= ["a.com" "b.com"] (:addresses m)))))
-  
+
 
 (defmacro with-private-fns [[ns fns] & tests]
   "Refers private fns from ns and runs tests in context."
@@ -71,6 +71,8 @@
 		(is (blank? (:stderr execp)))
 	))))
 
-  
-
-
+(deftest test-scp
+  (binding [exec (fn [h u c] c)]
+    (let [files ["a.text" "b.txt"]]
+      (is (= '("scp" "a.text" "b.txt" "user@host:/tmp")
+             (scp "host" "user" files "/tmp"))))))
