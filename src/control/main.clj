@@ -12,6 +12,5 @@
   [file & args]
   (do
     (load-control-file file)
-    (println args)
     (do-begin args)))
 
