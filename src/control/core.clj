@@ -4,6 +4,10 @@
         [clojure.walk :only [walk]]
 		[clojure.contrib.def :only [defvar- defvar]]))
 
+(def bash-reset "\033[0m")
+(def bash-bold "\033[1m")
+(def bash-redbold "\033[1;31m")
+(def bash-greenbold "\033[1;32m")
 
 (defvar- *runtime* (Runtime/getRuntime))
 
@@ -32,7 +36,7 @@
 	(.waitFor process)))
 (defn gen-log
   [host tag content]
-  (str host ":" tag ": " content))
+  (str bash-redbold host ":" bash-greenbold tag ": " bash-reset content))
 
 (defn log-with-tag
   [host tag content]
@@ -98,7 +102,7 @@
 (defn- perform
   [host user task taskName arguments]
   (do
-	(println (str "Performing " (name taskName) " for " host))
+	(println (str bash-bold "Performing " (name taskName) " for " host bash-reset))
 	(apply task host user arguments)))
 
 (defn- arg-count [f] (let [m (first (.getDeclaredMethods (class f))) p (.getParameterTypes m)] (alength p)))
@@ -117,7 +121,7 @@
 	(let [expect-count (- (arg-count task) 2)]
       (when-exit (not= expect-count (count args)) (str "Task " (name taskName) " just needs " expect-count " arguments")))
 	(do
-	  (println  (str "Performing " (name clusterName)))
+	  (println  (str bash-bold "Performing " (name clusterName) bash-reset))
 	  (dorun (map #(perform % user task taskName args) addresses))
 	  (dorun (map #(perform (:host %) (:user %) task taskName args) clients))
 	  (shutdown-agents))))
