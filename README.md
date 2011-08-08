@@ -80,7 +80,7 @@ executed on. The actual command sent and the user used to send it is
 displayed. stdout and stderr output of the remote process is identified
 as well as the final exit code of the local ssh command. 
 
-## SCP files
+## scp or rsync files
 
 If you want to scp files to remote machines,you could use scp function
    
@@ -90,7 +90,15 @@ If you want to scp files to remote machines,you could use scp function
 
 We defined a new task named "deploy" to copy release1.tar.gz and release2.tar.gz to remote machine's /home/alogin directory.
 
+Also,you can use rsync to transfer files
 
+		 (deftask :deploy "scp files to remote machines"
+	        []
+   	  		(rsync "src/" "/home/login"))
+
+Then it will be interpred as
+
+	     rsync src/ user@host:/home/login
    
 ## Define clusters
 
@@ -111,6 +119,18 @@ Also,you can configure :clients for special machines:
 				  :addresses ["a.domain.com" "b.domain.com"])
 
 Then clojure-control will use "clogin" to login c.domain.com,but use "login" to login a.domain.com and b.domain.com.
+
+Also,you can configure ssh,scp or rsync options to cluster:
+
+		 (defcluster :mycluster
+		 	      :ssh-options "-p 44"
+				  :scp-options "-v"
+				  :rsync-options "-i"
+		 		  :clients [
+				 		   { :host "c.domain.com" :user "clogin"}
+				 		   ]
+				  :user "login"	
+				  :addresses ["a.domain.com" "b.domain.com"])
 
 
 ##Pass arguments to task
