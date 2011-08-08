@@ -55,7 +55,7 @@
   `(let ~(reduce #(conj %1 %2 `(ns-resolve '~ns '~%2)) [] fns)
 	 ~@tests))
 
-(with-private-fns [control.core [perform spawn await-process]]
+(with-private-fns [control.core [perform spawn await-process user-at-host? find-client-options]]
   (deftest test-perform
 	(deftask :test "test-task"
 	  [a b]
@@ -69,7 +69,17 @@
 		(is (= 0 status))
 		(is (= "hello" (:stdout execp)))
 		(is (blank? (:stderr execp)))
-		))))
+		)))
+  (deftest test-user-at-host?
+	(let [f (user-at-host? "host" "user")]
+	  (is (f {:user "user" :host "host"}))
+	  (is (not (f {:user "hello" :host "host"}))))
+	)
+  (deftest test-find-client-options
+	(let [cluster {:ssh-options "-abc" :clients [ {:user "login" :host "a.domain.com" :ssh-options "-def"} ]}]
+	  (is (= "-abc" (find-client-options "b.domain.com" "login" cluster :ssh-options)))
+	  (is (= "-abc" (find-client-options "a.domain.com" "alogin" cluster :ssh-options)))
+	  (is (= "-def" (find-client-options "a.domain.com" "login" cluster :ssh-options))))))
 
 (defn not-nil?
   [x]

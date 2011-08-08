@@ -60,21 +60,31 @@
   [host user]
   (str user "@" host))
 
+(defn- user-at-host?
+  [host user]
+  (fn [m]
+	(and (= (:user m) user) (= (:host m) host))))
+
+(defn- find-client-options
+  [host user cluster sym]
+  (let [m (first (filter (user-at-host? host user) (:clients cluster)))]
+	(or (sym m) (sym cluster))))
+
 (defn ssh
   [host user cluster cmd]
-  (let [ssh-options (:ssh-options cluster)]
+  (let [ssh-options (find-client-options host user cluster :ssh-options)]
 	(log-with-tag host "ssh" ssh-options cmd)
 	(exec host user ["ssh" ssh-options (ssh-client host user) cmd])))
 
 (defn rsync
   [host user cluster src dst]
-  (let [rsync-options (:rsync-options cluster)]
+  (let [rsync-options (find-client-options host user cluster :rsync-options)]
 	(log-with-tag host "rsync" rsync-options (str src " ==>" dst))
 	(exec host user ["rsync" rsync-options src (str (ssh-client host user) ":" dst)])))
 
 (defn scp
   [host user cluster files remoteDir]
-  (let [scp-options (:scp-options cluster)]
+  (let [scp-options (find-client-options host user cluster :scp-options)]
 	(log-with-tag host "scp" scp-options
 	  (join " " (concat files [ " ==> " remoteDir])))
 	(exec host user

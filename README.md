@@ -120,14 +120,14 @@ Also,you can configure :clients for special machines:
 
 Then clojure-control will use "clogin" to login c.domain.com,but use "login" to login a.domain.com and b.domain.com.
 
-Also,you can configure ssh,scp or rsync options to cluster:
+Also,you can configure ssh,scp or rsync options for the whole cluster or special machines:
 
 		 (defcluster :mycluster
 		 	      :ssh-options "-p 44"
 				  :scp-options "-v"
 				  :rsync-options "-i"
 		 		  :clients [
-				 		   { :host "c.domain.com" :user "clogin"}
+				 		   { :host "c.domain.com" :user "clogin" :ssh-options "-v -p 43"}
 				 		   ]
 				  :user "login"	
 				  :addresses ["a.domain.com" "b.domain.com"])
