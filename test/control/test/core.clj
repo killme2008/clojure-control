@@ -14,8 +14,8 @@
 
 (defn- arg-count [f] (let [m (first (.getDeclaredMethods (class f))) p (.getParameterTypes m)] (alength p)))
 (deftest test-gen-log
-  (is (= "localhost:ssh: test" (gen-log "localhost" "ssh" "test")))
-  (is (= "a.domain.com:scp: hello world" (gen-log "a.domain.com" "scp" "hello world"))))
+  (is (= "\033[1;31mlocalhost:\033[1;32mssh: \033[0mtest" (gen-log "localhost" "ssh" "test")))
+  (is (= "\033[1;31ma.domain.com:\033[1;32mscp: \033[0mhello world" (gen-log "a.domain.com" "scp" "hello world"))))
 
 (deftest test-ssh-client
   (is (= "apple@localhost" (ssh-client "localhost" "apple")))
@@ -25,8 +25,8 @@
 (deftest test-task
   (is (= 0 (count @tasks)))
   (deftask :test "test task"
-		[]
-		(+ 1 2))
+	[]
+	(+ 1 2))
   (is (= 1 (count @tasks)))
   (is (= 0 (count @clusters)))
   (is (function? (:test @tasks)))
@@ -37,10 +37,10 @@
 (deftest test-cluster
   (is (= 0 (count @clusters)))
   (defcluster :mycluster
-		   :clients [{:host "a.domain.com" :user "apple"}]
-		   :addresses ["a.com" "b.com"]
-		   :user "dennis"
-		   )
+	:clients [{:host "a.domain.com" :user "apple"}]
+	:addresses ["a.com" "b.com"]
+	:user "dennis"
+	)
   (is (= 0 (count @tasks)))
   (is (= 1 (count @clusters)))
   (let [m (:mycluster @clusters)]
@@ -52,14 +52,14 @@
 
 (defmacro with-private-fns [[ns fns] & tests]
   "Refers private fns from ns and runs tests in context."
-    `(let ~(reduce #(conj %1 %2 `(ns-resolve '~ns '~%2)) [] fns)
-         ~@tests))
+  `(let ~(reduce #(conj %1 %2 `(ns-resolve '~ns '~%2)) [] fns)
+	 ~@tests))
 
 (with-private-fns [control.core [perform spawn await-process]]
   (deftest test-perform
 	(deftask :test "test-task"
-		  [a b]
-		  (+ a b))
+	  [a b]
+	  (+ a b))
 	(let [t (:test @tasks)]
 	  (is (= 10 (perform 1 2 t :test '(3 4))))))
   (deftest test-spawn
@@ -69,7 +69,7 @@
 		(is (= 0 status))
 		(is (= "hello" (:stdout execp)))
 		(is (blank? (:stderr execp)))
-	))))
+		))))
 
 (deftest test-scp
   (binding [exec (fn [h u c] c)]
