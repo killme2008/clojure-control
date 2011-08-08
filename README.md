@@ -24,6 +24,7 @@ And there will be a file named "control-0.2.0.jar" at project directory.Then use
 Or you can just add src/control/core.clj to your classpath.
 
 Type
+
 		lein install
 
 to install clojure-control,and it will add a shell script to ~/.lein/bin,then you can just use clojure-control to start your tasks:
