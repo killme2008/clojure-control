@@ -14,8 +14,8 @@
 
 (defn- arg-count [f] (let [m (first (.getDeclaredMethods (class f))) p (.getParameterTypes m)] (alength p)))
 (deftest test-gen-log
-  (is (= "\033[1;31mlocalhost:\033[1;32mssh: \033[0mtest" (gen-log "localhost" "ssh" "test")))
-  (is (= "\033[1;31ma.domain.com:\033[1;32mscp: \033[0mhello world" (gen-log "a.domain.com" "scp" "hello world"))))
+  (is (= "\033[1;31mlocalhost:\033[1;32mssh: \033[0mtest" (gen-log "localhost" "ssh" '("test"))))
+  (is (= "\033[1;31ma.domain.com:\033[1;32mscp: \033[0mhello world" (gen-log "a.domain.com" "scp" '("hello world")))))
 
 (deftest test-ssh-client
   (is (= "apple@localhost" (ssh-client "localhost" "apple")))
@@ -30,8 +30,8 @@
   (is (= 1 (count @tasks)))
   (is (= 0 (count @clusters)))
   (is (function? (:test @tasks)))
-  (is (= 2 (arg-count (:test @tasks))))
-  (is (= 10 ((:test @tasks) 3 4))))
+  (is (= 3 (arg-count (:test @tasks))))
+  (is (= 15 ((:test @tasks) 3 4 5))))
 
 
 (deftest test-cluster
@@ -61,7 +61,7 @@
 	  [a b]
 	  (+ a b))
 	(let [t (:test @tasks)]
-	  (is (= 10 (perform 1 2 t :test '(3 4))))))
+	  (is (= 15 (perform 1 2 5 t :test '(3 4))))))
   (deftest test-spawn
 	(let [pagent (spawn (into-array String ["echo" "hello"]))]
 	  (let [status (await-process pagent)
@@ -71,8 +71,31 @@
 		(is (blank? (:stderr execp)))
 		))))
 
+(defn not-nil?
+  [x]
+  (not (nil? x)))
+(defn myexec
+  [h u c]
+  (filter not-nil? c))
+
 (deftest test-scp
-  (binding [exec (fn [h u c] c)]
+  (binding [exec myexec]
     (let [files ["a.text" "b.txt"]]
-      (is (= '("scp" "a.text" "b.txt" "user@host:/tmp")
-             (scp "host" "user" files "/tmp"))))))
+      (is (= '("scp" "-v" "a.text" "b.txt" "user@host:/tmp")
+             (scp "host" "user" {:scp-options "-v"} files "/tmp")))
+	  (is (= '("scp" "a.text" "b.txt" "user@host:/tmp")
+             (scp "host" "user" nil files "/tmp"))))))
+
+(deftest test-ssh
+  (binding [exec myexec]
+	(is (= '("ssh" "-v" "user@host" "date"))
+		(ssh "host" "user" {:ssh-options "-v"} "date"))
+	(is (= '("ssh" "user@host" "date"))
+		(ssh "host" "user" nil "date"))))
+
+(deftest test-rsync
+  (binding [exec myexec]
+	(is (= '("rsync" "-v" "src" "user@host:dst"))
+		(rsync "host"  "user" {:rsync-options "-v"} "src" "dst"))
+	(is (= '("rsync" "src" "user@host:dst"))
+		(rsync "host"  "user" nil "src" "dst"))))
