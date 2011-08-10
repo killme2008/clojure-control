@@ -131,6 +131,16 @@ Also,you can configure ssh,scp or rsync options for the whole cluster or special
 				 		   ]
 				  :user "login"	
 				  :addresses ["a.domain.com" "b.domain.com"])
+##Execute task in parallel
+
+If you want to execute task for many remote machines in parallel,you can just configure cluster by
+
+   	   (defcluster :mycluster
+	              :parallel true
+				  :user "login"
+				  :addresses ["a.domain.com" "b.domain.com"])
+
+Then every task run with mycluster will be in parallel for different hosts.				 
 
 
 ##Pass arguments to task

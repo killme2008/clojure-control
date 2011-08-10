@@ -11,7 +11,7 @@
 
 (defvar- *runtime* (Runtime/getRuntime))
 
-(defstruct ExecProcess :process :in :err :stdout :stderr)
+(defstruct ExecProcess :process :in :err :stdout :stderr :status)
 
 (defn- spawn
   [cmdarray]
@@ -54,7 +54,8 @@
 		execp @pagent]
 	(log-with-tag host "stdout" (:stdout execp))
 	(log-with-tag host "stderr" (:stderr execp))
-	(log-with-tag host "exit" status)))
+	(log-with-tag host "exit" status)
+    (assoc execp :status status)))
 
 (defn ssh-client
   [host user]
@@ -135,6 +136,7 @@
 				   taskName (keyword (second args))
 				   args (next (next args))
 				   cluster (clusterName @clusters)
+				   parallel (:parallel cluster)
 				   user (:user cluster)
 				   addresses (:addresses cluster)
 				   clients (:clients cluster)
@@ -143,10 +145,10 @@
 			   (when-exit (and (empty? addresses)  (empty? clients)) (str "Empty clients for cluster " (name clusterName)))
 			   (let [task-arg-count (- (arg-count task) 3)]
 				 (when-exit (not= task-arg-count (count args)) (str "Task " (name taskName) " just needs " task-arg-count " arguments")))
-			   (do
-				 (println  (str bash-bold "Performing " (name clusterName) bash-reset))
-				 (dorun (map #(perform % user cluster task taskName args) addresses))
-				 (dorun (map #(perform (:host %) (:user %) cluster task taskName args) clients))
+			   (let [map-fn (if parallel pmap map)]
+				 (println  (str bash-bold "Performing " (name clusterName) bash-reset (if parallel " in parallel")))
+				 (dorun (pmap #(perform % user cluster task taskName args) addresses))
+				 (dorun (pmap #(perform (:host %) (:user %) cluster task taskName args) clients))
 				 (shutdown-agents)))))
 
 
