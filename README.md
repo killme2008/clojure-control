@@ -98,11 +98,11 @@ Also,you can use rsync to transfer files
 
 		 (deftask :deploy "scp files to remote machines"
 	        []
-   	  		(rsync "src/" "/home/login"))
+   	  		(rsync "src/" ":/home/login"))
 
 Then it will be interpred as
 
-	     rsync src/ user@host:/home/login
+	     rsync src/ user@host::/home/login
    
 ## Define clusters
 
