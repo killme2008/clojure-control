@@ -12,6 +12,10 @@ To include clojure-control,add:
 
    		 [control "0.2.1"]
 
+##Leiningen Plugin
+
+A great lein plugin was developed by sunny87,it is [lein-control](https://github.com/sunng87/lein-control).Recommend everyone try this plugin.
+
 ##Build
 
 Clone this repository with git or download the latest version using the GitHub repository Downloads link.
