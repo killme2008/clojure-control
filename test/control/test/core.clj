@@ -55,7 +55,10 @@
   `(let ~(reduce #(conj %1 %2 `(ns-resolve '~ns '~%2)) [] fns)
 	 ~@tests))
 
-(with-private-fns [control.core [perform spawn await-process user-at-host? find-client-options]]
+(with-private-fns [control.core [perform spawn await-process user-at-host? find-client-options make-cmd-array]]
+  (deftest test-make-cmd-array
+	(is (= ["ssh" "-v" "-p 44" "user@host"] (make-cmd-array "ssh" ["-v" "-p 44"] ["user@host"])))
+	(is (= ["rsync" "-arz" "--delete" "src" "user@host::share"] (make-cmd-array "rsync" ["-arz" "--delete"] ["src" "user@host::share"]))))
   (deftest test-perform
 	(deftask :test "test-task"
 	  [a b]

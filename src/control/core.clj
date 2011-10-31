@@ -71,27 +71,30 @@
   (let [m (first (filter (user-at-host? host user) (:clients cluster)))]
 	(or (sym m) (sym cluster))))
 
+(defn- make-cmd-array
+  [cmd options others]
+  (if (vector? options)
+	(concat (cons cmd options) others)
+	(cons cmd (cons options others))))
+
 (defn ssh
   [host user cluster cmd]
   (let [ssh-options (find-client-options host user cluster :ssh-options)]
 	(log-with-tag host "ssh" ssh-options cmd)
-	(exec host user ["ssh" ssh-options (ssh-client host user) cmd])))
+	(exec host user (make-cmd-array "ssh" ssh-options [(ssh-client host user) cmd]))))
 
 (defn rsync
   [host user cluster src dst]
   (let [rsync-options (find-client-options host user cluster :rsync-options)]
 	(log-with-tag host "rsync" rsync-options (str src " ==>" dst))
-	(exec host user ["rsync" rsync-options src (str (ssh-client host user) ":" dst)])))
+	(exec host user (make-cmd-array "rsync" rsync-options [src (str (ssh-client host user) ":" dst)]))))
 
 (defn scp
   [host user cluster files remoteDir]
   (let [scp-options (find-client-options host user cluster :scp-options)]
 	(log-with-tag host "scp" scp-options
 	  (join " " (concat files [ " ==> " remoteDir])))
-	(exec host user
-		  (concat ["scp" scp-options] files [(str (ssh-client host user) ":" remoteDir)]))))
-
-
+	(exec host user (make-cmd-array "scp" scp-options (concat files [(str (ssh-client host user) ":" remoteDir)])))))
 
 (defvar tasks (atom (hash-map)))
 (defvar clusters (atom (hash-map)))

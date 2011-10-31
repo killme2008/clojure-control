@@ -10,7 +10,7 @@ The idea came from [node-control](https://github.com/tsmith/node-control).
 
 To include clojure-control,add:
 
-   		 [control "0.2.0"]
+   		 [control "0.2.1"]
 
 ##Build
 
@@ -19,7 +19,7 @@ Use [leiningen](https://github.com/technomancy/leiningen) to build project
 
 		lein jar
 
-And there will be a file named "control-0.2.0.jar" at project directory.Then use as a standard jar by adding it to your classpath.
+And there will be a file named "control-0.2.1.jar" at project directory.Then use as a standard jar by adding it to your classpath.
 
 Or you can just add src/control/core.clj to your classpath.
 
@@ -57,7 +57,7 @@ Get the current date from the two machines listed in the 'mycluster' config with
 
 If saved in a file named "controls.clj",run with
    		
-		java -cp clojure.jar:clojure-contrib.jar:control-0.2.0.jar clojure.main controls.clj mycluster date
+		java -cp clojure.jar:clojure-contrib.jar:control-0.2.1.jar clojure.main controls.clj mycluster date
 
 If you have a script to start clojure,it can be started simply
    
@@ -131,6 +131,11 @@ Also,you can configure ssh,scp or rsync options for the whole cluster or special
 				 		   ]
 				  :user "login"	
 				  :addresses ["a.domain.com" "b.domain.com"])
+
+And,otpions can be a vector:
+
+			:rsync-options ["-vzrtopg","--delete"]
+
 ##Execute task in parallel
 
 If you want to execute task for many remote machines in parallel,you can just configure cluster by
