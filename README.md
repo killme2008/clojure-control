@@ -132,7 +132,7 @@ Also,you can configure ssh,scp or rsync options for the whole cluster or special
 				  :user "login"	
 				  :addresses ["a.domain.com" "b.domain.com"])
 
-And,otpions can be a vector:
+Options can be a vector,for example:
 
 			:rsync-options ["-vzrtopg","--delete"]
 
