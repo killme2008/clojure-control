@@ -241,8 +241,11 @@ Now you can create an empty control file
 
                 lein control init
 
-By default, there will be a `control.clj` on your project home. You
-can add clusters and tasks in the control's manner. To check your
+By default, there will be a `control.clj` on your project home. If you
+have a custom control file, you have to specify it in your
+project.clj with `:control {:control-file <your-file-name>}`.
+
+Then you can add clusters and tasks in the control's manner. To check your
 cluster, use:
 
                 lein control show <cluster-name>
