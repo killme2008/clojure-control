@@ -12,11 +12,7 @@ To include clojure-control,add:
 
    		 [control "0.2.1"]
 
-##Leiningen Plugin
-
-A great lein plugin was developed by sunny87,it is [lein-control](https://github.com/sunng87/lein-control).Recommend everyone try this plugin.
-
-##Build
+## Build
 
 Clone this repository with git or download the latest version using the GitHub repository Downloads link.
 Use [leiningen](https://github.com/technomancy/leiningen) to build project
@@ -152,7 +148,7 @@ If you want to execute task for many remote machines in parallel,you can just co
 Then every task run with mycluster will be in parallel for different hosts.				 
 
 
-##Pass arguments to task
+## Pass arguments to task
 
 As you seen,define task using a argument vector to pass arguments for task.For example,i want to scp special file to remote machines,then
 
@@ -167,7 +163,7 @@ Run with
 
 Then "release.tar.gz" in command line arguments would be passed to scp macro as "file" argument,then copy it to remote machines and decompress it.
 
-##Shell command DSL
+## Shell command DSL
 
 Inspired by [Fabric](http://docs.fabfile.org/en/1.2.0/api/core/context_managers.html "fabric"), a set of shell context DSL are provided for your convenience.
 You can use these macros in your ssh task.
@@ -231,15 +227,35 @@ Will work as:
 
     sudo service tomcat start; 
 
-##Contributors
+## Leiningen Plugin
+
+The lein-control plugin has been merged into clojure-control since
+0.2.2. To use it within your project, just add clojure-control to your
+dev-dependencies:
+
+                :dev-dependency [[control "0.2.2"]]
+
+and run `lein deps` to resolve it.
+
+Now you can create an empty control file
+
+                lein control init
+
+By default, there will be a `control.clj` on your project home. You
+can add clusters and tasks in the control's manner. To check your
+cluster, use:
+
+                lein control show <cluster-name>
+
+When everything is ready, execute your tasks with :
+
+                lein control run <cluster-name> <task-name> [args]
+
+## Contributors
 
 [sunng87](https://github.com/sunng87)  
 [onycloud](https://github.com/onycloud/)
 
-##Lein plugin
-
-[lein-control](https://github.com/sunng87/lein-control) by sunny87
-				
 
 
 
