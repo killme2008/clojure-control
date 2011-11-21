@@ -10,7 +10,7 @@ The idea came from [node-control](https://github.com/tsmith/node-control).
 
 To include clojure-control,add:
 
-   		 [control "0.2.2"]
+   		 [control "0.2.3-SNAPSHOT"]
 
 ## Leiningen Plugin
 
@@ -18,7 +18,7 @@ The lein-control plugin has been merged into clojure-control since
 0.2.2. To use it within your project, just add clojure-control to your
 dev-dependencies:
 
-                :dev-dependencies [[control "0.2.2"]]
+                :dev-dependencies [[control "0.2.3-SNAPSHOT"]]
 
 and run `lein deps` to resolve it.
 
@@ -199,8 +199,8 @@ You can use these macros in your ssh task.
 Change directory then execute some command:
 
     (use [control.commands])
-    (cd "/home/login"
-        (run "ls"))
+	(ssh  (cd "/home/login"
+	        (run "ls")))
 
 It would be executed as:
 
