@@ -51,12 +51,15 @@
   [project & args]
   (do 
     (load-control-file project)
-    (if-let [cluster-name (first args)] 
-      (doseq
-          [c (:clients ((keyword cluster-name) @clusters))
-           a (:addresses ((keyword cluster-name) @clusters))]
-        (println (str (:user c) "@" (:host c)))
-        (println (str (:user @clusters) "@" a))))))
+    (if-let [cluster-name (first args)]
+      (let [user (:user ((keyword cluster-name) @clusters))]
+        (doseq
+            [c (:clients ((keyword cluster-name) @clusters))]
+          (println (str (:user c) "@" (:host c))))
+        (doseq
+            [a (:addresses ((keyword cluster-name) @clusters))]
+          (println (str user "@" a)))))))
+
 
 (defn control
   "Leiningen plugin for Clojure-Control"
