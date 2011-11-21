@@ -1,7 +1,7 @@
 (ns leiningen.control
   (:use [control.core :only [do-begin clusters]]
-           [leiningen.help :only [help-for]]
-           [clojure.java.io :only [file]]))
+        [leiningen.help :only [help-for]]
+        [clojure.java.io :only [file]]))
 
 (defn- get-config [project key]
   (get-in project [:control key]))
@@ -15,10 +15,10 @@
       (refer-clojure)
       (use '[control core commands])
       (load-file
-        (or 
-          (get-config project :control-file)
-          "./control.clj")))
-  (catch java.io.FileNotFoundException e (println "control file not found."))))
+       (or 
+        (get-config project :control-file)
+        "./control.clj")))
+    (catch java.io.FileNotFoundException e (println "control file not found."))))
 
 (defn- run-control [project args]
   (do
@@ -31,15 +31,15 @@
   (let [control-file (file "." "control.clj")]
     (if-not (.exists control-file)
       (spit control-file 
-        (str 
-          "(defcluster :default-cluster\n"
-          "  :clients [\n"
-          "    {:host \"localhost\" :user \"root\"}\n"
-          "  ])\n"
-          "\n"
-          "(deftask :date \"echo date on cluster\""
-          "  []\n"
-          "  (ssh \"date\"))\n")))))
+            (str 
+             "(defcluster :default-cluster\n"
+             "  :clients [\n"
+             "    {:host \"localhost\" :user \"root\"}\n"
+             "  ])\n"
+             "\n"
+             "(deftask :date \"echo date on cluster\""
+             "  []\n"
+             "  (ssh \"date\"))\n")))))
 
 (defn run
   "Run user-defined clojure-control tasks against certain cluster"
@@ -53,20 +53,22 @@
     (load-control-file project)
     (if-let [cluster-name (first args)] 
       (doseq
-        [c (:clients ((keyword cluster-name) @clusters))]
-        (println (str (:user c) "@" (:host c)))))))
+          [c (:clients ((keyword cluster-name) @clusters))
+           a (:addresses ((keyword cluster-name) @clusters))]
+        (println (str (:user c) "@" (:host c)))
+        (println (str (:user @clusters) "@" a))))))
 
 (defn control
   "Leiningen plugin for Clojure-Control"
   {:help-arglists '([subtask [cluster task [args...]]])
    :subtasks [#'init #'run #'show]}
   ([project]
-    (println (help-for "control")))
+     (println (help-for "control")))
   ([project subtask & args]
-    (case subtask
-      "init" (apply init project args)
-      "run" (apply run project args)
-      "show" (apply show project args)
-      (println (help-for "control")))))
+     (case subtask
+           "init" (apply init project args)
+           "run" (apply run project args)
+           "show" (apply show project args)
+           (println (help-for "control")))))
 
 
