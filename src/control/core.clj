@@ -150,8 +150,8 @@
 				 (when-exit (not= task-arg-count (count args)) (str "Task " (name taskName) " just needs " task-arg-count " arguments")))
 			   (let [map-fn (if parallel pmap map)]
 				 (println  (str bash-bold "Performing " (name clusterName) bash-reset (if parallel " in parallel")))
-				 (dorun (pmap #(perform % user cluster task taskName args) addresses))
-				 (dorun (pmap #(perform (:host %) (:user %) cluster task taskName args) clients))
+				 (dorun (map-fn #(perform % user cluster task taskName args) addresses))
+				 (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args) clients))
 				 (shutdown-agents)))))
 
 
