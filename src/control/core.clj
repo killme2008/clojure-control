@@ -4,19 +4,26 @@
         [clojure.walk :only [walk]]
 		[clojure.contrib.def :only [defvar- defvar]]))
 
+(def *enable-color* true)
 (defvar- bash-reset "\033[0m")
 (defvar- bash-bold "\033[1m")
 (defvar- bash-redbold "\033[1;31m")
 (defvar- bash-greenbold "\033[1;32m")
 
 (defmacro cli-bash-bold [& content]
-  `(str bash-bold ~@content bash-reset))
+  `(if *enable-color*
+     (str bash-bold ~@content bash-reset)
+     (str ~@content)))
 
 (defmacro cli-bash-redbold [& content]
-  `(str bash-redbold ~@content bash-reset))
+  `(if *enable-color*
+     (str bash-redbold ~@content bash-reset)
+     (str ~@content)))
 
 (defmacro cli-bash-greenbold [& content]
-  `(str bash-greenbold ~@content bash-reset))
+  `(if *enable-color*
+     (str bash-greenbold ~@content bash-reset)
+     (str ~@content)))
 
 (defvar- *runtime* (Runtime/getRuntime))
 

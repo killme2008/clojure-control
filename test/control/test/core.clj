@@ -3,6 +3,7 @@
   (:use [clojure.test])
   (:use [clojure.string :only [blank?]]))
 
+
 (defn control-fixture [f]
   (try
 	(f)
@@ -14,8 +15,9 @@
 
 (defn- arg-count [f] (let [m (first (.getDeclaredMethods (class f))) p (.getParameterTypes m)] (alength p)))
 (deftest test-gen-log
-  (is (= "\033[1;31mlocalhost:\033[1;32mssh: \033[0mtest" (gen-log "localhost" "ssh" '("test"))))
-  (is (= "\033[1;31ma.domain.com:\033[1;32mscp: \033[0mhello world" (gen-log "a.domain.com" "scp" '("hello world")))))
+  (binding [*enable-color* false]
+    (is (= "localhost:ssh: test" (gen-log "localhost" "ssh" '("test"))))
+    (is (= "a.domain.com:scp: hello world" (gen-log "a.domain.com" "scp" '("hello world"))))))
 
 (deftest test-ssh-client
   (is (= "apple@localhost" (ssh-client "localhost" "apple")))
