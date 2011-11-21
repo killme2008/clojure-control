@@ -4,10 +4,19 @@
         [clojure.walk :only [walk]]
 		[clojure.contrib.def :only [defvar- defvar]]))
 
-(def bash-reset "\033[0m")
-(def bash-bold "\033[1m")
-(def bash-redbold "\033[1;31m")
-(def bash-greenbold "\033[1;32m")
+(def {^private: true} bash-reset "\033[0m")
+(def {^private: true} bash-bold "\033[1m")
+(def {^private: true} bash-redbold "\033[1;31m")
+(def {^private: true} bash-greenbold "\033[1;32m")
+
+(defmacro cli-bash-bold [& content]
+  `(str bash-bold ~@content bash-reset))
+
+(defmacro cli-bash-redbold [& content]
+  `(str bash-redbold ~@content bash-reset))
+
+(defmacro cli-bash-greenbold [& content]
+  `(str bash-greenbold ~@content bash-reset))
 
 (defvar- *runtime* (Runtime/getRuntime))
 
@@ -36,7 +45,7 @@
 	(.waitFor process)))
 (defn gen-log
   [host tag content]
-  (str bash-redbold host ":" bash-greenbold tag ": " bash-reset (join " " content)))
+  (str (cli-bash-redbold host ":")  (cli-bash-greenbold tag ": ")  (join " " content)))
 
 (defn log-with-tag
   [host tag & content]
@@ -127,7 +136,7 @@
 (defn- perform
   [host user cluster task taskName arguments]
   (do
-	(println (str bash-bold "Performing " (name taskName) " for " host bash-reset))
+	(println (cli-bash-bold "Performing " (name taskName) " for " host))
 	(apply task host user cluster arguments)))
 
 (defn- arg-count [f] (let [m (first (.getDeclaredMethods (class f))) p (.getParameterTypes m)] (alength p)))
@@ -153,7 +162,6 @@
 				 (dorun (map-fn #(perform % user cluster task taskName args) addresses))
 				 (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args) clients))
 				 (shutdown-agents)))))
-
 
 (defn begin
   []
