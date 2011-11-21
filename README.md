@@ -10,7 +10,35 @@ The idea came from [node-control](https://github.com/tsmith/node-control).
 
 To include clojure-control,add:
 
-   		 [control "0.2.1"]
+   		 [control "0.2.2"]
+
+## Leiningen Plugin
+
+The lein-control plugin has been merged into clojure-control since
+0.2.2. To use it within your project, just add clojure-control to your
+dev-dependencies:
+
+                :dev-dependencies [[control "0.2.2"]]
+
+and run `lein deps` to resolve it.
+
+Now you can create an empty control file
+
+                lein control init
+
+By default, there will be a `control.clj` on your project home. If you
+have a custom control file, you have to specify it in your
+project.clj with `:control {:control-file <your-file-name>}`.
+
+Then you can add clusters and tasks in the control's manner. To check your
+cluster, use:
+
+                lein control show <cluster-name>
+
+When everything is ready, execute your tasks with :
+
+                lein control run <cluster-name> <task-name> [args]
+
 
 ## Build
 
@@ -226,33 +254,6 @@ Run command with sudo:
 Will work as:
 
     sudo service tomcat start; 
-
-## Leiningen Plugin
-
-The lein-control plugin has been merged into clojure-control since
-0.2.2. To use it within your project, just add clojure-control to your
-dev-dependencies:
-
-                :dev-dependency [[control "0.2.2"]]
-
-and run `lein deps` to resolve it.
-
-Now you can create an empty control file
-
-                lein control init
-
-By default, there will be a `control.clj` on your project home. If you
-have a custom control file, you have to specify it in your
-project.clj with `:control {:control-file <your-file-name>}`.
-
-Then you can add clusters and tasks in the control's manner. To check your
-cluster, use:
-
-                lein control show <cluster-name>
-
-When everything is ready, execute your tasks with :
-
-                lein control run <cluster-name> <task-name> [args]
 
 ## Contributors
 
