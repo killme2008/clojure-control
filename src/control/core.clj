@@ -4,10 +4,10 @@
         [clojure.walk :only [walk]]
 		[clojure.contrib.def :only [defvar- defvar]]))
 
-(def {^private: true} bash-reset "\033[0m")
-(def {^private: true} bash-bold "\033[1m")
-(def {^private: true} bash-redbold "\033[1;31m")
-(def {^private: true} bash-greenbold "\033[1;32m")
+(defvar- bash-reset "\033[0m")
+(defvar- bash-bold "\033[1m")
+(defvar- bash-redbold "\033[1;31m")
+(defvar- bash-greenbold "\033[1;32m")
 
 (defmacro cli-bash-bold [& content]
   `(str bash-bold ~@content bash-reset))
