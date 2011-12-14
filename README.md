@@ -6,7 +6,7 @@ Clojure-control depends only on OpenSSH and clojure on the local control machine
 
 The idea came from [node-control](https://github.com/tsmith/node-control).
 
-##Leiningen Usagew
+##Leiningen Usage
 
 To include clojure-control,add:
 
