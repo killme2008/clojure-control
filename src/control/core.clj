@@ -159,7 +159,7 @@
         ~else)))
 
 (defn- perform [host user cluster task taskName arguments]
-  (do (println (cli-bash-bold "Performing " (name taskName) " for " host))
+  (do (if *enable-logging* (println (cli-bash-bold "Performing " (name taskName) " for " host)))
       (apply task host user cluster arguments)))
 
 (defn- arg-count [f]
