@@ -4,8 +4,8 @@
         [clojure.walk :only [walk]]
         [clojure.contrib.def :only [defvar- defvar]]))
 
-(def *enable-color* true)
-(def ^dynamic *enable-logging* true)
+(defvar ^:dynamic *enable-color* true)
+(defvar- ^:dynamic *enable-logging* true)
 (defvar- bash-reset "\033[0m")
 (defvar- bash-bold "\033[1m")
 (defvar- bash-redbold "\033[1;31m")
@@ -26,7 +26,7 @@
      (str bash-greenbold ~@content bash-reset)
      (str ~@content)))
 
-(defvar- *runtime* (Runtime/getRuntime))
+(defvar- ^:dynamic *runtime* (Runtime/getRuntime))
 
 (defstruct ExecProcess :process :in :err :stdout :stderr :status)
 
@@ -69,7 +69,7 @@
 (defn- not-nil? [obj]
   (not (nil? obj)))
 
-(defn exec [host user cmdcol]
+(defn ^:dynamic exec [host user cmdcol]
   (let [pagent (spawn (into-array String (filter not-nil? cmdcol)))
         status (await-process pagent)
         execp @pagent]
@@ -99,10 +99,10 @@
   (let [ssh-options (find-client-options host user cluster :ssh-options)]
 	(log-with-tag host "ssh" ssh-options cmd)
 	(exec host
-              user
-              (make-cmd-array "ssh"
-                              ssh-options
-                              [(ssh-client host user) cmd]))))
+          user
+          (make-cmd-array "ssh"
+                          ssh-options
+                          [(ssh-client host user) cmd]))))
 
 (defn rsync [host user cluster src dst]
   (let [rsync-options (find-client-options host user cluster :rsync-options)]
@@ -169,45 +169,45 @@
 
 (defn do-begin [args]
   (when-exit (< (count args) 2)
-    "Please offer cluster and task name"
-    (let [clusterName (keyword (first args))
-          taskName (keyword (second args))
-          args (next (next args))
-          cluster (clusterName @clusters)
-          parallel (:parallel cluster)
-          user (:user cluster)
-          addresses (:addresses cluster)
-          clients (:clients cluster)
-          task (taskName @tasks)
-          log (:log cluster)]
-      (when-exit (nil? task)
-        (str "No task named " (name taskName)))
-      (when-exit (and (empty? addresses)
-        (empty? clients))
-                 (str "Empty clients for cluster "
-                      (name clusterName)))
-      (let [task-arg-count (- (arg-count task) 3)]
-        (when-exit (not= task-arg-count (count args))
-          (str "Task "
-               (name taskName)
-               " just needs "
-               task-arg-count
-               " arguments")))
-      (binding [*enable-logging* (if (nil? log) true log)]
-        (if *enable-logging*
-          (println  (str bash-bold
-                         "Performing "
-                         (name clusterName)
-                         bash-reset
-                         (if parallel
-                           " in parallel"))))
-        (let [map-fn (if parallel pmap map)
-              a (dorun (map-fn #(perform % user cluster task taskName args)
-                               addresses))
-              c (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args)
-                               clients))]
-          (shutdown-agents)
-          (concat a c))))))
+             "Please offer cluster and task name"
+             (let [clusterName (keyword (first args))
+                   taskName (keyword (second args))
+                   args (next (next args))
+                   cluster (clusterName @clusters)
+                   parallel (:parallel cluster)
+                   user (:user cluster)
+                   addresses (:addresses cluster)
+                   clients (:clients cluster)
+                   task (taskName @tasks)
+                   log (:log cluster)]
+               (when-exit (nil? task)
+                          (str "No task named " (name taskName)))
+               (when-exit (and (empty? addresses)
+                               (empty? clients))
+                          (str "Empty clients for cluster "
+                               (name clusterName)))
+               (let [task-arg-count (- (arg-count task) 3)]
+                 (when-exit (not= task-arg-count (count args))
+                            (str "Task "
+                                 (name taskName)
+                                 " just needs "
+                                 task-arg-count
+                                 " arguments")))
+               (binding [*enable-logging* (if (nil? log) true log)]
+                 (if *enable-logging*
+                   (println  (str bash-bold
+                                  "Performing "
+                                  (name clusterName)
+                                  bash-reset
+                                  (if parallel
+                                    " in parallel"))))
+                 (let [map-fn (if parallel pmap map)
+                       a (dorun (map-fn #(perform % user cluster task taskName args)
+                                        addresses))
+                       c (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args)
+                                        clients))]
+                   (shutdown-agents)
+                   (concat a c))))))
 
 (defn begin []
   (do-begin *command-line-args*))
