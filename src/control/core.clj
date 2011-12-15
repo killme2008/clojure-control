@@ -194,15 +194,16 @@
                task-arg-count
                " arguments")))
       (let [map-fn (if parallel pmap map)]
-        (println  (str bash-bold
-                       "Performing "
-                       (name clusterName)
-                       bash-reset
-                       (if parallel
-                         " in parallel")))
         (binding [*enable-logging* (if (nil? log) true log)]
+          (if *enable-logging*
+            (println  (str bash-bold
+                           "Performing "
+                           (name clusterName)
+                           bash-reset
+                           (if parallel
+                             " in parallel"))))
           (dorun (map-fn #(perform % user cluster task taskName args)
-                                 addresses))
+                         addresses))
           (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args)
                          clients)))
         (shutdown-agents)))))
