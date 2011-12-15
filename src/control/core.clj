@@ -5,6 +5,7 @@
         [clojure.contrib.def :only [defvar- defvar]]))
 
 (def *enable-color* true)
+(def ^dynamic *enable-logging* true)
 (defvar- bash-reset "\033[0m")
 (defvar- bash-bold "\033[1m")
 (defvar- bash-redbold "\033[1;31m")
@@ -62,7 +63,7 @@
        (join " " content)))
 
 (defn log-with-tag [host tag & content]
-  (if (not (blank? (join " " content)))
+  (if (and *enable-logging* (not (blank? (join " " content))))
     (println (gen-log host tag content))))
 
 (defn- not-nil? [obj]
@@ -158,7 +159,7 @@
         ~else)))
 
 (defn- perform [host user cluster task taskName arguments]
-  (do (println (cli-bash-bold "Performing " (name taskName) " for " host))
+  (do (if *enable-logging* (println (cli-bash-bold "Performing " (name taskName) " for " host)))
       (apply task host user cluster arguments)))
 
 (defn- arg-count [f]
@@ -177,7 +178,8 @@
           user (:user cluster)
           addresses (:addresses cluster)
           clients (:clients cluster)
-          task (taskName @tasks)]
+          task (taskName @tasks)
+          log (:log cluster)]
       (when-exit (nil? task)
         (str "No task named " (name taskName)))
       (when-exit (and (empty? addresses)
@@ -191,18 +193,21 @@
                " just needs "
                task-arg-count
                " arguments")))
-      (let [map-fn (if parallel pmap map)]
-        (println  (str bash-bold
-                       "Performing "
-                       (name clusterName)
-                       bash-reset
-                       (if parallel
-                         " in parallel")))
-        (dorun (map-fn #(perform % user cluster task taskName args)
-                       addresses))
-        (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args)
-                       clients))
-        (shutdown-agents)))))
+      (binding [*enable-logging* (if (nil? log) true log)]
+        (if *enable-logging*
+          (println  (str bash-bold
+                         "Performing "
+                         (name clusterName)
+                         bash-reset
+                         (if parallel
+                           " in parallel"))))
+        (let [map-fn (if parallel pmap map)
+              a (dorun (map-fn #(perform % user cluster task taskName args)
+                               addresses))
+              c (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args)
+                               clients))]
+          (shutdown-agents)
+          (concat a c))))))
 
 (defn begin []
   (do-begin *command-line-args*))
