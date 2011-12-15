@@ -5,6 +5,7 @@
         [clojure.contrib.def :only [defvar- defvar]]))
 
 (def *enable-color* true)
+(def ^dynamic *enable-logging* true)
 (defvar- bash-reset "\033[0m")
 (defvar- bash-bold "\033[1m")
 (defvar- bash-redbold "\033[1;31m")
@@ -62,7 +63,7 @@
        (join " " content)))
 
 (defn log-with-tag [host tag & content]
-  (if (not (blank? (join " " content)))
+  (if (and *enable-logging* (not (blank? (join " " content))))
     (println (gen-log host tag content))))
 
 (defn- not-nil? [obj]
@@ -177,7 +178,8 @@
           user (:user cluster)
           addresses (:addresses cluster)
           clients (:clients cluster)
-          task (taskName @tasks)]
+          task (taskName @tasks)
+          log (:log cluster)]
       (when-exit (nil? task)
         (str "No task named " (name taskName)))
       (when-exit (and (empty? addresses)
@@ -198,10 +200,11 @@
                        bash-reset
                        (if parallel
                          " in parallel")))
-        (dorun (map-fn #(perform % user cluster task taskName args)
-                       addresses))
-        (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args)
-                       clients))
+        (binding [*enable-logging* (if (nil? log) true log)]
+          (dorun (map-fn #(perform % user cluster task taskName args)
+                                 addresses))
+          (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args)
+                         clients)))
         (shutdown-agents)))))
 
 (defn begin []
