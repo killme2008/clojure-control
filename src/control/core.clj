@@ -4,8 +4,9 @@
         [clojure.walk :only [walk]]
         [clojure.contrib.def :only [defvar- defvar]]))
 
-(defvar ^:dynamic *enable-color* true)
-(defvar- ^:dynamic *enable-logging* true)
+(defvar  *enable-color* true)
+(defvar-  *enable-logging* true)
+(defvar-  *runtime* (Runtime/getRuntime))
 (defvar- bash-reset "\033[0m")
 (defvar- bash-bold "\033[1m")
 (defvar- bash-redbold "\033[1;31m")
@@ -26,7 +27,6 @@
      (str bash-greenbold ~@content bash-reset)
      (str ~@content)))
 
-(defvar- ^:dynamic *runtime* (Runtime/getRuntime))
 
 (defstruct ExecProcess :process :in :err :stdout :stderr :status)
 
@@ -69,7 +69,7 @@
 (defn- not-nil? [obj]
   (not (nil? obj)))
 
-(defn ^:dynamic exec [host user cmdcol]
+(defn  exec [host user cmdcol]
   (let [pagent (spawn (into-array String (filter not-nil? cmdcol)))
         status (await-process pagent)
         execp @pagent]
