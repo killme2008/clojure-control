@@ -1,7 +1,7 @@
 (ns #^{:doc "A set of DSL for ssh, inspired by Fabric"
        :author "Sun Ning <classicning@gmail.com>"}
   control.commands
-  (:use [clojure.contrib.string :only [join]]))
+  (:use [clojure.string :only [join]]))
 
 (defmacro path
   "modify shell path"
@@ -33,4 +33,4 @@
   [cmd]
   `(str "sudo " ~cmd "; "))
 
-                            
+
