@@ -1,16 +1,16 @@
 (ns control.core
   (:use [clojure.java.io :only [reader]]
         [clojure.string :only [join blank?]]
-        [clojure.walk :only [walk]]
-        [clojure.contrib.def :only [defvar- defvar]]))
+        [clojure.walk :only [walk]]))
 
-(defvar  *enable-color* true)
-(defvar-  *enable-logging* true)
-(defvar-  *runtime* (Runtime/getRuntime))
-(defvar- bash-reset "\033[0m")
-(defvar- bash-bold "\033[1m")
-(defvar- bash-redbold "\033[1;31m")
-(defvar- bash-greenbold "\033[1;32m")
+
+(def  ^:dynamic *enable-color* true)
+(def ^{:dynamic true :private true} *enable-logging* true)
+(def ^{:dynamic true :private true}*runtime* (Runtime/getRuntime))
+(def ^:private bash-reset "\033[0m")
+(def ^:private bash-bold "\033[1m")
+(def ^:private bash-redbold "\033[1;31m")
+(def ^:private bash-greenbold "\033[1;32m")
 
 (defmacro cli-bash-bold [& content]
   `(if *enable-color*
@@ -69,7 +69,7 @@
 (defn- not-nil? [obj]
   (not (nil? obj)))
 
-(defn  exec [host user cmdcol]
+(defn  ^:dynamic exec [host user cmdcol]
   (let [pagent (spawn (into-array String (filter not-nil? cmdcol)))
         status (await-process pagent)
         execp @pagent]
@@ -123,8 +123,8 @@
                           scp-options
                           (concat files [(str (ssh-client host user) ":" remoteDir)])))))
 
-(defvar tasks (atom (hash-map)))
-(defvar clusters (atom (hash-map)))
+(def tasks (atom (hash-map)))
+(def clusters (atom (hash-map)))
 
 (defmacro deftask [name desc arguments & body]
   (let [new-body (map #(concat (list (first %) 'host 'user 'cluster) (rest %)) body)]
