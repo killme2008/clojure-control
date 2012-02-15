@@ -1,7 +1,7 @@
 (ns control.core
   (:use [clojure.java.io :only [reader]]
         [clojure.string :only [join blank?]]
-        [clojure.walk :only [walk]]
+        [clojure.walk :only [walk postwalk]]
         [clojure.contrib.def :only [defvar- defvar]]))
 
 (defvar  *enable-color* true)
@@ -113,15 +113,18 @@
                           rsync-options
                           [src (str (ssh-client host user) ":" dst)]))))
 
-(defn scp [host user cluster files remoteDir]
-  (let [scp-options (find-client-options host user cluster :scp-options)]
+(defn scp [host user cluster local remote]
+  (let [files (if (vector? local)
+                local
+                [local])
+        scp-options (find-client-options host user cluster :scp-options)]
     (log-with-tag host "scp" scp-options
-      (join " " (concat files [ " ==> " remoteDir])))
+      (join " " (concat files [ " ==> " remote])))
     (exec host
           user
           (make-cmd-array "scp"
                           scp-options
-                          (concat files [(str (ssh-client host user) ":" remoteDir)])))))
+                          (concat files [(str (ssh-client host user) ":" remote)])))))
 
 (defvar tasks (atom (hash-map)))
 (defvar clusters (atom (hash-map)))
@@ -136,7 +139,15 @@
             decl)
         arguments (first m)
         body (next m)
-        new-body (map #(concat (list (first %) 'host 'user 'cluster) (rest %)) body)]
+                                        ;new-body (map #(concat (list (first %) 'host 'user 'cluster) (rest %)) body)]
+        new-body (postwalk (fn [item]
+                             (if (list? item)
+                               (let [cmd (first item)]
+                                 (if (or (= cmd (symbol "ssh")) (= cmd (symbol "scp")) (= cmd (symbol "rsync")))
+                                   (concat (list cmd  'host 'user 'cluster) (rest item))
+                                   item))
+                               item))
+                           body)]
     `(swap! tasks
             assoc
             ~name
