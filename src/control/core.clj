@@ -126,8 +126,17 @@
 (defvar tasks (atom (hash-map)))
 (defvar clusters (atom (hash-map)))
 
-(defmacro deftask [name desc arguments & body]
-  (let [new-body (map #(concat (list (first %) 'host 'user 'cluster) (rest %)) body)]
+(defmacro
+  ^{:doc "Define a task for remote machines"
+    :arglists '([name doc-string? [params*] body])
+    :added "0.1"}
+  deftask [name & decl ]
+  (let [m (if (string? (first decl))
+            (next decl)
+            decl)
+        arguments (first m)
+        body (next m)
+        new-body (map #(concat (list (first %) 'host 'user 'cluster) (rest %)) body)]
     `(swap! tasks
             assoc
             ~name
@@ -146,7 +155,11 @@
         identity
         args))
 
-(defmacro defcluster [name & args]
+(defmacro
+  ^{:doc "Define a cluster including some remote machines"
+    :arglists '([name & options])
+    :added "0.1"}
+  defcluster [name & args]
   `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
      (swap! clusters assoc ~name (assoc m# :name ~name))))
 
