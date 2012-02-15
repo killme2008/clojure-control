@@ -197,7 +197,7 @@ You can use these macros in your ssh task.
 
 Change directory then execute some command:
 
-    (use [control.commands])
+    (use '[control.commands])
 	(ssh  (cd "/home/login"
 	        (run "ls")))
 
