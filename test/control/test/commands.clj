@@ -48,9 +48,9 @@
   (is    (= "sed -i.bak -r -e \" s/hello\\sworld/;&/g\" test"
             (comm "test" "hello\\sworld" :char ";"))))
 
-(deftest un-comm
-  (is   (= "sed -i.bak -r -e \" s/hello\\sworld/#&/g\" test"
-           (comm "test" "hello\\sworld")))
-  (is    (= "sed -i.bak -r -e \" s/hello\\sworld/;&/g\" test"
-            (comm "test" "hello\\sworld" :char ";"))))
+(deftest test-uncomm
+  (is   (= "sed -i.bak -r -e \" s/#(hello\\sworld)/\\1/g\" test"
+           (uncomm "test" "hello\\sworld")))
+  (is    (= "sed -i.bak -r -e \" s/;(hello\\sworld)/\\1/g\" test"
+            (uncomm "test" "hello\\sworld" :char ";"))))
 

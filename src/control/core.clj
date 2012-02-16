@@ -156,6 +156,9 @@
 ;;All clusters defined in control file
 (defvar clusters (atom (hash-map)))
 
+(defvar- *system-functions*
+  #{(symbol "scp") (symbol "ssh") (symbol "rsync") (symbol "call") (symbol "exists?")})
+
 (defmacro
   ^{:doc "Define a task for executing on remote machines:
            (deftask :date \"Get date from remote machines\"
@@ -173,7 +176,7 @@
         new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
-                                 (if (or (= cmd (symbol "ssh")) (= cmd (symbol "scp")) (= cmd (symbol "rsync")) (= cmd (symbol "call")))
+                                 (if (cmd *system-functions*)
                                    (concat (list cmd  'host 'user 'cluster) (rest item))
                                    item))
                                item))
@@ -192,6 +195,12 @@
   (apply
    (task @tasks)
    host user cluster args))
+
+(defn exists?
+  "Check if a file exists"
+  [host user cluster file]
+  (= (:status (ssh host user cluster (str "test -e " file))) 0))
+
 
 (defn- unquote-cluster [args]
   (walk (fn [item]

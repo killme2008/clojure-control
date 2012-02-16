@@ -74,6 +74,7 @@
     (apply sed file pat (str char "&") opts)))
 
 (defn  uncomm
+  "uncomment a line in a file"
   [file pat & opts]
   (let [m (apply hash-map opts)
         char  (or (:char m) "#")]
