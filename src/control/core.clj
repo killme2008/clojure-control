@@ -159,7 +159,7 @@
         new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
-                                 (if (or (= cmd (symbol "ssh")) (= cmd (symbol "scp")) (= cmd (symbol "rsync")))
+                                 (if (or (= cmd (symbol "ssh")) (= cmd (symbol "scp")) (= cmd (symbol "rsync")) (= cmd (symbol "call")))
                                    (concat (list cmd  'host 'user 'cluster) (rest item))
                                    item))
                                item))
@@ -170,6 +170,13 @@
             ~(list 'fn
                    (vec (concat '[host user cluster] arguments))
                    (cons 'do new-body)))))
+
+(defn call
+  "Call another task in a task"
+  [host user cluster task & args]
+  (apply
+   (task @tasks)
+   host user cluster args))
 
 (defn- unquote-cluster [args]
   (walk (fn [item]
