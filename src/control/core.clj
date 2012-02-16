@@ -95,7 +95,12 @@
     (concat (cons cmd options) others)
     (cons cmd (cons options others))))
 
-(defn ssh [host user cluster cmd & opts]
+(defn ssh
+  "Execute commands via ssh:
+   (ssh \"date\")
+   (ssh \"ps aux|grep java\")
+"
+  [host user cluster cmd & opts]
   (let [m (apply hash-map opts)
         sudo (:sudo m)
         cmd (if sudo
@@ -118,7 +123,12 @@
                           rsync-options
                           [src (str (ssh-client host user) ":" dst)]))))
 
-(defn scp [host user cluster local remote & opts]
+(defn scp
+  "Copy local files to remote machines:
+   (scp \"test.txt\" \"remote.txt\")
+   (scp [\"1.txt\" \"2.txt\"] \"/home/deploy/\")
+"
+  [host user cluster local remote & opts]
   (let [files (if (vector? local)
                 local
                 [local])
@@ -141,12 +151,16 @@
       (if mode
         (apply ssh host user cluster (str "chmod " mode  " " remote) opts)
         rt))))
-
+;;All tasks defined in control file
 (defvar tasks (atom (hash-map)))
+;;All clusters defined in control file
 (defvar clusters (atom (hash-map)))
 
 (defmacro
-  ^{:doc "Define a task for remote machines"
+  ^{:doc "Define a task for executing on remote machines:
+           (deftask :date \"Get date from remote machines\"
+                     (ssh \"date\"))
+"
     :arglists '([name doc-string? [params*] body])
     :added "0.1"}
   deftask [name & decl ]
@@ -172,7 +186,8 @@
                    (cons 'do new-body)))))
 
 (defn call
-  "Call another task in a task"
+  "Call other tasks in deftask,for example:
+     (call :ps \"java\")"
   [host user cluster task & args]
   (apply
    (task @tasks)

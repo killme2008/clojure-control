@@ -79,6 +79,11 @@
         char  (or (:char m) "#")]
     (apply sed file (str char "(" pat ")") "\\1" opts)))
 
+(defn cat
+  "cat a file"
+  [file]
+  (str "cat " file))
+
 (defn chmod
   "chmod [mod] [file]"
   [mod file]
