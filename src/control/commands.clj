@@ -26,12 +26,22 @@
 (defmacro run
   "simply run a command"
   [cmd]
-  `(str ~cmd "; "))
+  `(str ~cmd " ; "))
+
+(defn all
+  "simply run several commands"
+  [ & cmds]
+  (let [rt  (apply str cmds)]
+    (if (.endsWith rt " ; ")
+      rt
+      (str rt " ; "))))
 
 (defmacro sudo
   "run a command with sudo"
   [cmd]
-  `(str "sudo " ~cmd "; "))
+  `(if (.endsWith ~cmd " ; ")
+     (str "sudo " ~cmd)
+     (str "sudo " ~cmd " ; ")))
 
 (defn append
   "Append a line to a file"
@@ -40,12 +50,12 @@
         escaple (:escaple m)
         sudo (:sudo m)]
     (if sudo
-      (str "echo '" line "' | sudo tee -a " file) 
-      (str "echo '" line "' >> " file))))
+      (str "echo '" line "' | sudo tee -a " file " ; ") 
+      (str "echo '" line "' >> " file " ; "))))
 
 (defn sed-
   [file before after flags backup limit]
-  (str "sed -i" backup " -r -e \"" limit " s/"  before "/" after "/" flags "\" " file))
+  (str "sed -i" backup " -r -e \"" limit " s/"  before "/" after "/" flags "\" " file " ; "))
 
 (defn sed
   "Use sed to replace strings matched pattern with options.Valid options include:
@@ -88,5 +98,5 @@
 (defn chmod
   "chmod [mod] [file]"
   [mod file]
-  (str "chmod " mod " " file))
+  (str "chmod " mod " " file " ; "))
 
