@@ -5,6 +5,7 @@
         [clojure.contrib.def :only [defvar- defvar]]))
 
 (defvar  *enable-color* true)
+(defvar  *debug* false)
 (defvar-  *enable-logging* true)
 (defvar-  *runtime* (Runtime/getRuntime))
 (defvar- bash-reset "\033[0m")
@@ -181,6 +182,8 @@
                                    item))
                                item))
                            body)]
+    (if *debug*
+      (prn new-body))
     `(swap! tasks
             assoc
             ~name
