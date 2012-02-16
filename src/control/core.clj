@@ -8,6 +8,7 @@
 (defvar  *debug* false)
 (defvar-  *enable-logging* true)
 (defvar-  *runtime* (Runtime/getRuntime))
+(defvar- *max-output-lines* 1000)
 (defvar- bash-reset "\033[0m")
 (defvar- bash-bold "\033[1m")
 (defvar- bash-redbold "\033[1;31m")
@@ -41,11 +42,11 @@
     (send-off pagent
               (fn [exec-process]
                 (assoc exec-process :stdout (str (:stdout exec-process)
-                                                 (join "\r\n" (doall (line-seq in)))))))
+                                                 (join "\r\n" (take *max-output-lines*  (line-seq in)))))))
     (send-off pagent
               (fn [exec-process]
                 (assoc exec-process :stderr (str (:stderr exec-process)
-                                                 (join "\r\n" (doall (line-seq err)))))))
+                                                 (join "\r\n" (take *max-output-lines* (line-seq err)))))))
     pagent))
 
 (defn- await-process [pagent]
