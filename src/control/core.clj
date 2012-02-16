@@ -95,8 +95,13 @@
     (concat (cons cmd options) others)
     (cons cmd (cons options others))))
 
-(defn ssh [host user cluster cmd]
-  (let [ssh-options (find-client-options host user cluster :ssh-options)]
+(defn ssh [host user cluster cmd & opts]
+  (let [m (apply hash-map opts)
+        sudo (:sudo m)
+        cmd (if sudo
+              (str "sudo " cmd)
+              cmd)
+        ssh-options (or (:ssh-options opts) (find-client-options host user cluster :ssh-options))]
 	(log-with-tag host "ssh" ssh-options cmd)
 	(exec host
           user
@@ -113,18 +118,29 @@
                           rsync-options
                           [src (str (ssh-client host user) ":" dst)]))))
 
-(defn scp [host user cluster local remote]
+(defn scp [host user cluster local remote & opts]
   (let [files (if (vector? local)
                 local
                 [local])
-        scp-options (find-client-options host user cluster :scp-options)]
+        m (apply hash-map opts)
+        scp-options (or (:scp-options m) (find-client-options host user cluster :scp-options))
+        mode (:mode m)
+        sudo (:sudo m)
+        tmp (if sudo
+              (str "/tmp/" (System/currentTimeMillis))
+              remote)]
     (log-with-tag host "scp" scp-options
-      (join " " (concat files [ " ==> " remote])))
-    (exec host
-          user
-          (make-cmd-array "scp"
-                          scp-options
-                          (concat files [(str (ssh-client host user) ":" remote)])))))
+      (join " " (concat files [ " ==> " tmp])))
+    (let [rt (exec host
+                   user
+                   (make-cmd-array "scp"
+                                   scp-options
+                                   (concat files [(str (ssh-client host user) ":" tmp)])))]
+      (if sudo
+        (apply ssh host user cluster (str "mv "  tmp " " remote) opts))
+      (if mode
+        (apply ssh host user cluster (str "chmod " mode  " " remote) opts)
+        rt))))
 
 (defvar tasks (atom (hash-map)))
 (defvar clusters (atom (hash-map)))

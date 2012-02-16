@@ -33,7 +33,7 @@
   (is (= 0 (count @clusters)))
   (is (function? (:test @tasks)))
   (is (= 3 (arg-count (:test @tasks))))
-  (is (= 15 ((:test @tasks) 3 4 5))))
+  (is (= 3 ((:test @tasks) 3 4 5))))
 
 
 (deftest test-cluster
@@ -66,7 +66,7 @@
 	  [a b]
 	  (+ a b))
 	(let [t (:test @tasks)]
-	  (is (= 15 (perform 1 2 5 t :test '(3 4))))))
+	  (is (= 7 (perform 1 2 5 t :test '(3 4))))))
   (deftest test-spawn
 	(let [pagent (spawn (into-array String ["echo" "hello"]))]
 	  (let [status (await-process pagent)
@@ -99,7 +99,12 @@
       (is (= '("scp" "-v" "a.text" "b.txt" "user@host:/tmp")
              (scp "host" "user" {:scp-options "-v"} files "/tmp")))
 	  (is (= '("scp" "a.text" "b.txt" "user@host:/tmp")
-             (scp "host" "user" nil files "/tmp"))))))
+             (scp "host" "user" nil files "/tmp")))
+      (is (= '("ssh" "user@host" "chmod 755 /tmp")
+             (scp "host" "user" nil files "/tmp" :mode 755)))
+      (is (= '("ssh" "user@host" "sudo chmod 755 /tmp")
+             (scp "host" "user" nil files "/tmp" :sudo true :mode 755))))))
+
 
 (deftest test-ssh
   (binding [exec myexec]
