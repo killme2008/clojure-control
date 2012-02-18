@@ -2,16 +2,16 @@
        :author "Sun Ning <classicning@gmail.com>  Dennis Zhuang<killme2008@gmail.com>"}
   control.commands)
 
-
+(def *sep* " ; ")
 (defmacro path
   "modify shell path"
   [new-path & cmd]
-  `(str "export PATH=" ~new-path ":$PATH; " ~@cmd))
+  `(str "export PATH=" ~new-path ":$PATH"  *sep* ~@cmd))
 
 (defmacro cd 
   "change current directory"
   [path & cmd]
-  `(str "cd " ~path "; " ~@cmd))
+  `(str "cd " ~path *sep* ~@cmd))
 
 (defmacro prefix 
   "execute a prefix command, for instance, activate shell profile"
@@ -23,25 +23,20 @@
   [key val & cmd]
   `(str ~key "=" ~val " " ~@cmd))
 
-(defmacro run
-  "simply run a command"
-  [cmd]
-  `(str ~cmd " ; "))
-
-(defn all
+(defn run
   "simply run several commands"
   [ & cmds]
   (let [rt  (apply str cmds)]
-    (if (.endsWith rt " ; ")
+    (if (.endsWith rt *sep*)
       rt
-      (str rt " ; "))))
+      (str rt *sep*))))
 
 (defmacro sudo
   "run a command with sudo"
   [cmd]
-  `(if (.endsWith ~cmd " ; ")
+  `(if (.endsWith ~cmd *sep*)
      (str "sudo " ~cmd)
-     (str "sudo " ~cmd " ; ")))
+     (str "sudo " ~cmd *sep*)))
 
 (defn append
   "Append a line to a file"
@@ -50,12 +45,12 @@
         escaple (:escaple m)
         sudo (:sudo m)]
     (if sudo
-      (str "echo '" line "' | sudo tee -a " file " ; ") 
-      (str "echo '" line "' >> " file " ; "))))
+      (str "echo '" line "' | sudo tee -a " file *sep*) 
+      (str "echo '" line "' >> " file *sep*))))
 
 (defn sed-
   [file before after flags backup limit]
-  (str "sed -i" backup " -r -e \"" limit " s/"  before "/" after "/" flags "\" " file " ; "))
+  (str "sed -i" backup " -r -e \"" limit " s/"  before "/" after "/" flags "\" " file *sep*))
 
 (defn sed
   "Use sed to replace strings matched pattern with options.Valid options include:
@@ -88,7 +83,7 @@
   [file pat & opts]
   (let [m (apply hash-map opts)
         char  (or (:char m) "#")]
-    (apply sed file (str char "(" pat ")") "\\1" opts)))
+    (apply sed file (str "\\s*" char "+\\s*(" pat ")") "\\1" opts)))
 
 (defn cat
   "cat a file"
@@ -98,5 +93,5 @@
 (defn chmod
   "chmod [mod] [file]"
   [mod file]
-  (str "chmod " mod " " file " ; "))
+  (str "chmod " mod " " file *sep*))
 

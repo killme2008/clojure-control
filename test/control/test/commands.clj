@@ -4,10 +4,10 @@
   (:use [clojure.test]))
 
 (deftest test-cd 
-  (is (= "cd /home/sun; " (cd "/home/sun"))))
+  (is (= "cd /home/sun ; " (cd "/home/sun"))))
 
 (deftest test-path
-  (is (= "export PATH=/home/sun/bin:$PATH; " (path "/home/sun/bin"))))
+  (is (= "export PATH=/home/sun/bin:$PATH ; " (path "/home/sun/bin"))))
 
 (deftest test-env-run
   (is (= "JAVA_OPTS=-XMaxPermSize=128m java -version ; "
@@ -15,12 +15,12 @@
               (run "java -version")))))
 
 (deftest test-cd-run
-  (is (= "cd /home/sun; ls ; "
+  (is (= "cd /home/sun ; ls ; "
          (cd "/home/sun"
              (run "ls")))))
 
 (deftest test-cd-prefix-run
-  (is (= "cd /home/sun; source ~/.bash_profile && ls ; "
+  (is (= "cd /home/sun ; source ~/.bash_profile && ls ; "
          (cd "/home/sun"
              (prefix "source ~/.bash_profile"
                      (run "ls"))))))
@@ -49,8 +49,8 @@
             (comm "test" "hello\\sworld" :char ";"))))
 
 (deftest test-uncomm
-  (is   (= "sed -i.bak -r -e \" s/#(hello\\sworld)/\\1/g\" test ; "
+  (is   (= "sed -i.bak -r -e \" s/\\s*#+\\s*(hello\\sworld)/\\1/g\" test ; "
            (uncomm "test" "hello\\sworld")))
-  (is    (= "sed -i.bak -r -e \" s/;(hello\\sworld)/\\1/g\" test ; "
+  (is    (= "sed -i.bak -r -e \" s/\\s*;+\\s*(hello\\sworld)/\\1/g\" test ; "
             (uncomm "test" "hello\\sworld" :char ";"))))
 
