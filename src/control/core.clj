@@ -8,7 +8,7 @@
 (def ^{:dynamic true :private true} *enable-logging* true)
 (def ^{:dynamic true :private true}*runtime* (Runtime/getRuntime))
 (defvar ^:dynamic  *debug* false)
-(defvar- ^{:dynamic true :private true} *max-output-lines* 1000)
+(defvar- ^{:dynamic true :private true} *max-output-lines* 10000)
 (def ^:private bash-reset "\033[0m")
 (def ^:private bash-bold "\033[1m")
 (def ^:private bash-redbold "\033[1;31m")
@@ -125,6 +125,8 @@
                           rsync-options
                           [src (str (ssh-client host user) ":" dst)]))))
 
+(def ^{:dynamic true} *tmp-dir* nil)
+
 (defn scp
   "Copy local files to remote machines:
    (scp \"test.txt\" \"remote.txt\")
@@ -138,21 +140,25 @@
         scp-options (or (:scp-options m) (find-client-options host user cluster :scp-options))
         mode (:mode m)
         sudo (:sudo m)
-        tmp (if sudo
-              (str "/tmp/" (System/currentTimeMillis))
+        use-tmp (or sudo mode)
+        tmp (if use-tmp
+              (or *tmp-dir* (str "/tmp/control-" (System/currentTimeMillis) "/"))
               remote)]
     (log-with-tag host "scp" scp-options
       (join " " (concat files [ " ==> " tmp])))
+    (if use-tmp
+      (ssh host user cluster (str "mkdir -p " tmp)))
     (let [rt (exec host
                    user
                    (make-cmd-array "scp"
                                    scp-options
                                    (concat files [(str (ssh-client host user) ":" tmp)])))]
-      (if sudo
-        (apply ssh host user cluster (str "mv "  tmp " " remote) opts))
       (if mode
-        (apply ssh host user cluster (str "chmod " mode  " " remote) opts)
+        (apply ssh host user cluster (str "chmod " mode  " " tmp "*") opts))
+      (if use-tmp
+        (apply ssh host user cluster (str "mv "  tmp "* " remote " ; rm -rf " tmp) opts)
         rt))))
+
 ;;All tasks defined in control file
 (defvar tasks (atom (hash-map)))
 ;;All clusters defined in control file
@@ -174,7 +180,6 @@
             decl)
         arguments (first m)
         body (next m)
-                                        ;new-body (map #(concat (list (first %) 'host 'user 'cluster) (rest %)) body)]
         new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
@@ -183,6 +188,8 @@
                                    item))
                                item))
                            body)]
+    (if (not (vector? arguments))
+      (throw (IllegalArgumentException. "Task must have arguments even if []")))
     (if *debug*
       (prn new-body))
     `(swap! tasks
