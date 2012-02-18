@@ -4,15 +4,15 @@
         [clojure.walk :only [walk postwalk]]
         [clojure.contrib.def :only [defvar- defvar]]))
 
-(defvar  *enable-color* true)
-(defvar  *debug* false)
-(defvar-  *enable-logging* true)
-(defvar-  *runtime* (Runtime/getRuntime))
-(defvar- *max-output-lines* 1000)
-(defvar- bash-reset "\033[0m")
-(defvar- bash-bold "\033[1m")
-(defvar- bash-redbold "\033[1;31m")
-(defvar- bash-greenbold "\033[1;32m")
+(def ^:dynamic *enable-color* true)
+(def ^{:dynamic true :private true} *enable-logging* true)
+(def ^{:dynamic true :private true}*runtime* (Runtime/getRuntime))
+(defvar ^:dynamic  *debug* false)
+(defvar- ^{:dynamic true :private true} *max-output-lines* 1000)
+(def ^:private bash-reset "\033[0m")
+(def ^:private bash-bold "\033[1m")
+(def ^:private bash-redbold "\033[1;31m")
+(def ^:private bash-greenbold "\033[1;32m")
 
 (defmacro cli-bash-bold [& content]
   `(if *enable-color*
@@ -71,7 +71,7 @@
 (defn- not-nil? [obj]
   (not (nil? obj)))
 
-(defn  exec [host user cmdcol]
+(defn  ^:dynamic  exec [host user cmdcol]
   (let [pagent (spawn (into-array String (filter not-nil? cmdcol)))
         status (await-process pagent)
         execp @pagent]
@@ -158,7 +158,7 @@
 ;;All clusters defined in control file
 (defvar clusters (atom (hash-map)))
 
-(defvar- *system-functions*
+(defvar- system-functions
   #{(symbol "scp") (symbol "ssh") (symbol "rsync") (symbol "call") (symbol "exists?")})
 
 (defmacro
@@ -178,7 +178,7 @@
         new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
-                                 (if (cmd *system-functions*)
+                                 (if (cmd system-functions)
                                    (concat (list cmd  'host 'user 'cluster) (rest item))
                                    item))
                                item))
