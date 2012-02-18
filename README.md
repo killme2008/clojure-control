@@ -8,6 +8,8 @@ The idea came from [node-control](https://github.com/tsmith/node-control).
 
 First,you may want to setup ssh public keys to avoid typing a password when login,please visit [HOWTO: set up ssh keys](http://pkeck.myweb.uga.edu/ssh/)
 
+A quick example at [here](https://github.com/killme2008/clojure-control/blob/master/samples/control.clj)
+
 ##Documents
 
 Please visit [wiki pages](https://github.com/killme2008/clojure-control/wiki).
