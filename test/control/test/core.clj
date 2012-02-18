@@ -94,15 +94,16 @@
   (filter not-nil? c))
 
 (deftest test-scp
-  (binding [exec myexec]
+  (binding [exec myexec
+            *tmp-dir* "/tmp/test/"]
     (let [files ["a.text" "b.txt"]]
       (is (= '("scp" "-v" "a.text" "b.txt" "user@host:/tmp")
              (scp "host" "user" {:scp-options "-v"} files "/tmp")))
 	  (is (= '("scp" "a.text" "b.txt" "user@host:/tmp")
              (scp "host" "user" nil files "/tmp")))
-      (is (= '("ssh" "user@host" "chmod 755 /tmp")
+      (is (= '("ssh" "user@host" "mv /tmp/test/* /tmp ; rm -rf /tmp/test/")
              (scp "host" "user" nil files "/tmp" :mode 755)))
-      (is (= '("ssh" "user@host" "sudo chmod 755 /tmp")
+      (is (= '("ssh" "user@host" "sudo mv /tmp/test/* /tmp ; rm -rf /tmp/test/")
              (scp "host" "user" nil files "/tmp" :sudo true :mode 755))))))
 
 
