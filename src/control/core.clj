@@ -158,7 +158,7 @@
 ;;All clusters defined in control file
 (defvar clusters (atom (hash-map)))
 
-(defvar- *system-functions*
+(defvar- system-functions
   #{(symbol "scp") (symbol "ssh") (symbol "rsync") (symbol "call") (symbol "exists?")})
 
 (defmacro
@@ -178,7 +178,7 @@
         new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
-                                 (if (cmd *system-functions*)
+                                 (if (cmd system-functions)
                                    (concat (list cmd  'host 'user 'cluster) (rest item))
                                    item))
                                item))

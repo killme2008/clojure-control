@@ -2,16 +2,16 @@
        :author "Sun Ning <classicning@gmail.com>  Dennis Zhuang<killme2008@gmail.com>"}
   control.commands)
 
-(def *sep* " ; ")
+(def SEP " ; ")
 (defmacro path
   "modify shell path"
   [new-path & cmd]
-  `(str "export PATH=" ~new-path ":$PATH"  *sep* ~@cmd))
+  `(str "export PATH=" ~new-path ":$PATH"  SEP ~@cmd))
 
 (defmacro cd 
   "change current directory"
   [path & cmd]
-  `(str "cd " ~path *sep* ~@cmd))
+  `(str "cd " ~path SEP ~@cmd))
 
 (defmacro prefix 
   "execute a prefix command, for instance, activate shell profile"
@@ -27,16 +27,16 @@
   "simply run several commands"
   [ & cmds]
   (let [rt  (apply str cmds)]
-    (if (.endsWith rt *sep*)
+    (if (.endsWith rt SEP)
       rt
-      (str rt *sep*))))
+      (str rt SEP))))
 
 (defmacro sudo
   "run a command with sudo"
   [cmd]
-  `(if (.endsWith ~cmd *sep*)
+  `(if (.endsWith ~cmd SEP)
      (str "sudo " ~cmd)
-     (str "sudo " ~cmd *sep*)))
+     (str "sudo " ~cmd SEP)))
 
 (defn append
   "Append a line to a file"
@@ -45,12 +45,12 @@
         escaple (:escaple m)
         sudo (:sudo m)]
     (if sudo
-      (str "echo '" line "' | sudo tee -a " file *sep*) 
-      (str "echo '" line "' >> " file *sep*))))
+      (str "echo '" line "' | sudo tee -a " file SEP) 
+      (str "echo '" line "' >> " file SEP))))
 
 (defn sed-
   [file before after flags backup limit]
-  (str "sed -i" backup " -r -e \"" limit " s/"  before "/" after "/" flags "\" " file *sep*))
+  (str "sed -i" backup " -r -e \"" limit " s/"  before "/" after "/" flags "\" " file SEP))
 
 (defn sed
   "Use sed to replace strings matched pattern with options.Valid options include:
@@ -93,5 +93,5 @@
 (defn chmod
   "chmod [mod] [file]"
   [mod file]
-  (str "chmod " mod " " file *sep*))
+  (str "chmod " mod " " file SEP))
 
