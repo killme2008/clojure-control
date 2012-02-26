@@ -5,7 +5,7 @@
         [clojure.contrib.def :only [defvar- defvar]]))
 
 (def ^:dynamic *enable-color* true)
-(def ^{:dynamic true :private true} *enable-logging* true)
+(def ^{:dynamic true} *enable-logging* true)
 (def ^{:dynamic true :private true}*runtime* (Runtime/getRuntime))
 (defvar ^:dynamic  *debug* false)
 (defvar- ^{:dynamic true :private true} *max-output-lines* 10000)
@@ -284,12 +284,12 @@
                                   (if parallel
                                     " in parallel"))))
                  (let [map-fn (if parallel pmap map)
-                       a (dorun (map-fn #(perform % user cluster task taskName args)
+                       a (doall (map-fn (fn [addr] [addr (perform addr user cluster task taskName args)])
                                         addresses))
-                       c (dorun (map-fn #(perform (:host %) (:user %) cluster task taskName args)
+                       c (doall (map-fn (fn [cli] [(:host cli) (perform (:host cli) (:user cli) cluster task taskName args)])
                                         clients))]
-                   (shutdown-agents)
-                   (concat a c))))))
+                   (into {} (concat a c)))))))
 
 (defn begin []
-  (do-begin *command-line-args*))
+  (do-begin *command-line-args*)
+  (shutdown-agents))
