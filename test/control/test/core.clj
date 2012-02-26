@@ -67,14 +67,6 @@
 	  (+ a b))
 	(let [t (:test @tasks)]
 	  (is (= 7 (perform 1 2 5 t :test '(3 4))))))
-  (deftest test-spawn
-	(let [pagent (spawn (into-array String ["echo" "hello"]))]
-	  (let [status (await-process pagent)
-			execp @pagent]
-		(is (= 0 status))
-		(is (= "hello" (:stdout execp)))
-		(is (blank? (:stderr execp)))
-		)))
   (deftest test-user-at-host?
 	(let [f (user-at-host? "host" "user")]
 	  (is (f {:user "user" :host "host"}))

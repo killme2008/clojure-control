@@ -1,14 +1,13 @@
 (ns control.core
   (:use [clojure.java.io :only [reader]]
+        [clojure.java.shell :only [sh]]
         [clojure.string :only [join blank?]]
         [clojure.walk :only [walk postwalk]]
         [clojure.contrib.def :only [defvar- defvar]]))
 
 (def ^:dynamic *enable-color* true)
 (def ^{:dynamic true} *enable-logging* true)
-(def ^{:dynamic true :private true}*runtime* (Runtime/getRuntime))
 (defvar ^:dynamic  *debug* false)
-(defvar- ^{:dynamic true :private true} *max-output-lines* 10000)
 (def ^:private bash-reset "\033[0m")
 (def ^:private bash-bold "\033[1m")
 (def ^:private bash-redbold "\033[1;31m")
@@ -30,34 +29,7 @@
      (str ~@content)))
 
 
-(defstruct ExecProcess :process :in :err :stdout :stderr :status)
-
-(defn- spawn
-  [cmdarray]
-  (let [process (.exec *runtime* cmdarray)
-        in (reader (.getInputStream process) :encoding "UTF-8")
-        err (reader (.getErrorStream process) :encoding "UTF-8")
-        execp (struct ExecProcess process in err)
-        pagent (agent execp)]
-    (send-off pagent
-              (fn [exec-process]
-                (assoc exec-process :stdout (str (:stdout exec-process)
-                                                 (join "\r\n" (take *max-output-lines*  (line-seq in)))))))
-    (send-off pagent
-              (fn [exec-process]
-                (assoc exec-process :stderr (str (:stderr exec-process)
-                                                 (join "\r\n" (take *max-output-lines* (line-seq err)))))))
-    pagent))
-
-(defn- await-process [pagent]
-  (let [execp @pagent
-        process (:process execp)
-        in (:in execp)
-        err (:err execp)]
-    (await pagent)
-    (.close in)
-    (.close err)
-    (.waitFor process)))
+(defstruct ExecProcess  :stdout :stderr :status)
 
 (defn gen-log [host tag content]
   (str (cli-bash-redbold host ":")
@@ -72,13 +44,15 @@
   (not (nil? obj)))
 
 (defn  ^:dynamic  exec [host user cmdcol]
-  (let [pagent (spawn (into-array String (filter not-nil? cmdcol)))
-        status (await-process pagent)
-        execp @pagent]
+  (let [rt (sh (filter not-nil? cmdcol))
+        status (:exit rt)
+        stdout (:out rt)
+        stderr (:err rt)
+        execp (struct-map ExecProcess stdout stderr status)]
     (log-with-tag host "stdout" (:stdout execp))
     (log-with-tag host "stderr" (:stderr execp))
     (log-with-tag host "exit" status)
-    (assoc execp :status status)))
+    execp))
 
 (defn ssh-client [host user]
   (str user "@" host))
@@ -133,8 +107,8 @@
    (scp [\"1.txt\" \"2.txt\"] \"/home/deploy/\")
 "
   [host user cluster local remote & opts]
-  (let [files (if (vector? local)
-                local
+  (let [files (if (coll? local)
+                (vec local)
                 [local])
         m (apply hash-map opts)
         scp-options (or (:scp-options m) (find-client-options host user cluster :scp-options))
