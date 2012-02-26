@@ -44,11 +44,11 @@
   (not (nil? obj)))
 
 (defn  ^:dynamic  exec [host user cmdcol]
-  (let [rt (sh (filter not-nil? cmdcol))
+  (let [rt (apply sh (filter not-nil? cmdcol))
         status (:exit rt)
         stdout (:out rt)
         stderr (:err rt)
-        execp (struct-map ExecProcess stdout stderr status)]
+        execp (struct-map ExecProcess :stdout stdout :stderr stderr :status status)]
     (log-with-tag host "stdout" (:stdout execp))
     (log-with-tag host "stderr" (:stderr execp))
     (log-with-tag host "exit" status)
