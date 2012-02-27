@@ -211,7 +211,7 @@
      `(when-exit ~test ~error nil))
   ([test error else]
      `(if ~test
-        (do (println ~error) (System/exit 1))
+        (do (println ~error) (throw (RuntimeException. ~error)))
         ~else)))
 
 (defn- perform [host user cluster task taskName arguments]
