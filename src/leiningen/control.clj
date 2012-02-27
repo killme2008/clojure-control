@@ -81,16 +81,19 @@
 
 (defn run
   "Run user-defined clojure-control tasks against certain cluster,
-      -p [--port] port, which control server port to connect for running"
+      -r [--[no-]remote],running commands on remote control server,default is false.
+      -p [--port] port, control server port,
+      -h [--host] host, control server host."
   [project & args]
   (let [[options extra-args]
         (cli args
-             ["-p" "--port" "Which port to connect." 
-              :parse-fn #(Integer/parseInt %)])
-        {:keys [port]} options]
-    (if (nil? port)
+             ["-p" "--port" "Which port to connect." :default 8123 :parse-fn #(Integer/parseInt %)]
+             ["-r" "--[no-]remote" :default false]
+             [ "-h" "--host" "Which host to connect." :default "localhost"])
+        {:keys [port host remote]} options]
+    (if-not remote
       (run-control project args)
-      (let [^java.net.Socket sock (java.net.Socket. "localhost" port)]
+      (let [^java.net.Socket sock (java.net.Socket. host port)]
         (.setTcpNoDelay sock true)
         (let [rdr (reader sock)
               wtr (writer sock)]
