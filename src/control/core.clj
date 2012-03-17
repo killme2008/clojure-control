@@ -6,7 +6,7 @@
 
 (def ^:dynamic *enable-color* true)
 (def ^{:dynamic true} *enable-logging* true)
-(def ^:dynamic  *debug* false)
+(def ^:dynamic *debug* false)
 (def ^:private bash-reset "\033[0m")
 (def ^:private bash-bold "\033[1m")
 (def ^:private bash-redbold "\033[1;31m")
@@ -133,9 +133,9 @@
         rt))))
 
 ;;All tasks defined in control file
-(def tasks (atom (hash-map)))
+(defonce tasks (atom (hash-map)))
 ;;All clusters defined in control file
-(def clusters (atom (hash-map)))
+(defonce clusters (atom (hash-map)))
 
 (def ^:private system-functions
   #{(symbol "scp") (symbol "ssh") (symbol "rsync") (symbol "call") (symbol "exists?")})
@@ -164,7 +164,7 @@
     (if (not (vector? arguments))
       (throw (IllegalArgumentException. "Task must have arguments even if []")))
     (if *debug*
-      (prn new-body))
+      (prn name "new-body:" new-body))
     `(swap! tasks
             assoc
             ~name
@@ -225,43 +225,50 @@
 (defn do-begin [args]
   (when-exit (< (count args) 2)
              "Please offer cluster and task name"
-             (let [clusterName (keyword (first args))
-                   taskName (keyword (second args))
-                   args (next (next args))
-                   cluster (clusterName @clusters)
+             (let [cluster-name (keyword (first args))
+                   task-name (keyword (second args))
+                   task-args (next (next args))
+                   cluster (cluster-name @clusters)
                    parallel (:parallel cluster)
                    user (:user cluster)
                    addresses (:addresses cluster)
                    clients (:clients cluster)
-                   task (taskName @tasks)
+                   task (task-name @tasks)
+                   includes (:includes cluster)
+                   debug (:debug cluster)
                    log (:log cluster)]
                (when-exit (nil? task)
-                          (str "No task named " (name taskName)))
+                          (str "No task named " (name task-name)))
                (when-exit (and (empty? addresses)
                                (empty? clients))
                           (str "Empty clients for cluster "
-                               (name clusterName)))
+                               (name cluster-name)))
                (let [task-arg-count (- (arg-count task) 3)]
-                 (when-exit (not= task-arg-count (count args))
+                 (when-exit (not= task-arg-count (count task-args))
                             (str "Task "
-                                 (name taskName)
+                                 (name task-name)
                                  " just needs "
                                  task-arg-count
                                  " arguments")))
-               (binding [*enable-logging* (if (nil? log) true log)]
+               (binding [*enable-logging* (if (nil? log) true log)
+                         *debug* debug]
                  (if *enable-logging*
                    (println  (str bash-bold
                                   "Performing "
-                                  (name clusterName)
+                                  (name cluster-name)
                                   bash-reset
                                   (if parallel
                                     " in parallel"))))
                  (let [map-fn (if parallel pmap map)
-                       a (doall (map-fn (fn [addr] [addr (perform addr user cluster task taskName args)])
+                       a (doall (map-fn (fn [addr] [addr (perform addr user cluster task task-name task-args)])
                                         addresses))
-                       c (doall (map-fn (fn [cli] [(:host cli) (perform (:host cli) (:user cli) cluster task taskName args)])
+                       c (doall (map-fn (fn [cli] [(:host cli) (perform (:host cli) (:user cli) cluster task task-name task-args)])
                                         clients))]
-                   (into {} (concat a c)))))))
+                   (merge (into {} (concat a c))
+                          (when includes
+                            (if (coll? includes)
+                              (mapcat #(do-begin (cons % (next args))) includes)
+                              (do-begin (cons (name includes) (next args)))))))))))
 
 (defn begin []
   (do-begin *command-line-args*)
