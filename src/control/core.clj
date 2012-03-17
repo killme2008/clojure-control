@@ -240,8 +240,9 @@
                (when-exit (nil? task)
                           (str "No task named " (name task-name)))
                (when-exit (and (empty? addresses)
+                               (empty? includes)
                                (empty? clients))
-                          (str "Empty clients for cluster "
+                          (str "Empty hosts for cluster "
                                (name cluster-name)))
                (let [task-arg-count (- (arg-count task) 3)]
                  (when-exit (not= task-arg-count (count task-args))
