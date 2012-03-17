@@ -1,4 +1,4 @@
-(defproject control "0.3.1-SNAPSHOT"
+(defproject control "0.3.2-SNAPSHOT"
   :description "A clojure DSL for system admin and deployment with many remote machines"
   :url "https://github.com/killme2008/clojure-control"
   :author "dennis zhuang(killme2008@gmail.com)"
