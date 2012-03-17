@@ -2,12 +2,11 @@
   (:use [clojure.java.io :only [reader]]
         [clojure.java.shell :only [sh]]
         [clojure.string :only [join blank?]]
-        [clojure.walk :only [walk postwalk]]
-        [clojure.contrib.def :only [defvar- defvar]]))
+        [clojure.walk :only [walk postwalk]]))
 
 (def ^:dynamic *enable-color* true)
 (def ^{:dynamic true} *enable-logging* true)
-(defvar ^:dynamic  *debug* false)
+(def ^:dynamic  *debug* false)
 (def ^:private bash-reset "\033[0m")
 (def ^:private bash-bold "\033[1m")
 (def ^:private bash-redbold "\033[1;31m")
@@ -134,11 +133,11 @@
         rt))))
 
 ;;All tasks defined in control file
-(defvar tasks (atom (hash-map)))
+(def tasks (atom (hash-map)))
 ;;All clusters defined in control file
-(defvar clusters (atom (hash-map)))
+(def clusters (atom (hash-map)))
 
-(defvar- system-functions
+(def ^:private system-functions
   #{(symbol "scp") (symbol "ssh") (symbol "rsync") (symbol "call") (symbol "exists?")})
 
 (defmacro
