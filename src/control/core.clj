@@ -218,9 +218,11 @@
       (apply task host user cluster arguments)))
 
 (defn- arg-count [f]
-  (let [m (first (.getDeclaredMethods (class f)))
-        p (.getParameterTypes m)]
-    (alength p)))
+  (let [m (first (filter #(= (.getName %) "invoke") (.getDeclaredMethods (class f))))
+        p (when m (.getParameterTypes m))]
+    (if p
+      (alength p)
+      3)))
 
 (defn do-begin [args]
   (when-exit (< (count args) 2)
@@ -245,7 +247,7 @@
                           (str "Empty hosts for cluster "
                                (name cluster-name)))
                (let [task-arg-count (- (arg-count task) 3)]
-                 (when-exit (not= task-arg-count (count task-args))
+                 (when-exit (> task-arg-count (count task-args))
                             (str "Task "
                                  (name task-name)
                                  " just needs "
