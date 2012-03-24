@@ -51,7 +51,8 @@ You may have to type password when running this task. You can setup ssh public k
 
 ##Documents
 
-Please visit [wiki pages](https://github.com/killme2008/clojure-control/wiki).
+* [Wiki](https://github.com/killme2008/clojure-control/wiki)
+* [API document](http://fnil.net/clojure-control/)
 
 ## Contributors
 
