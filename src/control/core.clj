@@ -12,38 +12,35 @@
 (def ^:private bash-redbold "\033[1;31m")
 (def ^:private bash-greenbold "\033[1;32m")
 
-(defmacro cli-bash-bold [& content]
+(defmacro ^:private cli-bash-bold [& content]
   `(if *enable-color*
      (str bash-bold ~@content bash-reset)
      (str ~@content)))
 
-(defmacro cli-bash-redbold [& content]
+(defmacro ^:private cli-bash-redbold [& content]
   `(if *enable-color*
      (str bash-redbold ~@content bash-reset)
      (str ~@content)))
 
-(defmacro cli-bash-greenbold [& content]
+(defmacro ^:private cli-bash-greenbold [& content]
   `(if *enable-color*
      (str bash-greenbold ~@content bash-reset)
      (str ~@content)))
 
 
-(defstruct ExecProcess  :stdout :stderr :status)
+(defstruct ^:private ExecProcess  :stdout :stderr :status)
 
 (defn gen-log [host tag content]
   (str (cli-bash-redbold host ":")
        (cli-bash-greenbold tag ": ")
        (join " " content)))
 
-(defn log-with-tag [host tag & content]
+(defn-  log-with-tag [host tag & content]
   (if (and *enable-logging* (not (blank? (join " " content))))
     (println (gen-log host tag content))))
 
-(defn- not-nil? [obj]
-  (not (nil? obj)))
-
 (defn  ^:dynamic  exec [host user cmdcol]
-  (let [rt (apply sh (filter not-nil? cmdcol))
+  (let [rt (apply sh (filter (complement nil?) cmdcol))
         status (:exit rt)
         stdout (:out rt)
         stderr (:err rt)
@@ -56,7 +53,7 @@
 (defn ssh-client [host user]
   (str user "@" host))
 
-(defn- user-at-host? [host user]
+(defn-  user-at-host? [host user]
   (fn [m]
     (and (= (:user m) user) (= (:host m) host))))
 
@@ -74,14 +71,20 @@
   "Execute commands via ssh:
    (ssh \"date\")
    (ssh \"ps aux|grep java\")
+   (ssh \"sudo apt-get update\" :sudo true)
+
+   Valid options:
+   :sudo   whether to run commands as root,default is false
+   :ssh-options  -- ssh options string
 "
+  {:arglists '([cmd & opts])}
   [host user cluster cmd & opts]
   (let [m (apply hash-map opts)
         sudo (:sudo m)
         cmd (if sudo
               (str "sudo " cmd)
               cmd)
-        ssh-options (or (:ssh-options opts) (find-client-options host user cluster :ssh-options))]
+        ssh-options (or (:ssh-options m) (find-client-options host user cluster :ssh-options))]
 	(log-with-tag host "ssh" ssh-options cmd)
 	(exec host
           user
@@ -89,8 +92,18 @@
                           ssh-options
                           [(ssh-client host user) cmd]))))
 
-(defn rsync [host user cluster src dst]
-  (let [rsync-options (find-client-options host user cluster :rsync-options)]
+(defn rsync 
+  "Rsync local files to remote machine's files,for example:
+     (deftask :deploy \"scp files to remote machines\" []
+    (rsync \"src/\" \":/home/login\"))
+
+    Valid options:
+    :rsync-options  -- rsync options string
+  "
+  {:arglists '([src dst & opts])}
+  [host user cluster src dst & opts]
+  (let [m (apply hash-map opts)
+        rsync-options (or (:rsync-options m) (find-client-options host user cluster :rsync-options))]
     (log-with-tag host "rsync" rsync-options (str src " ==>" dst))
     (exec host
           user
@@ -103,8 +116,14 @@
 (defn scp
   "Copy local files to remote machines:
    (scp \"test.txt\" \"remote.txt\")
-   (scp [\"1.txt\" \"2.txt\"] \"/home/deploy/\")
+   (scp [\"1.txt\" \"2.txt\"] \"/home/deploy/\" :sudo true :mode 755)
+
+  Valid options:
+    :sudo  -- whether to copy files to remote machines as root
+    :mode -- files permission on remote machines
+    :scp-options -- scp options string
 "
+  {:arglists '([local remote & opts])}
   [host user cluster local remote & opts]
   (let [files (if (coll? local)
                 (vec local)
@@ -144,6 +163,8 @@
   ^{:doc "Define a task for executing on remote machines:
            (deftask :date \"Get date from remote machines\"
                      (ssh \"date\"))
+
+          Please see https://github.com/killme2008/clojure-control/wiki/Define-tasks
 "
     :arglists '([name doc-string? [params*] body])
     :added "0.1"}
@@ -175,15 +196,17 @@
 (defn call
   "Call other tasks in deftask,for example:
      (call :ps \"java\")"
+  {:arglists '([task & args])}
   [host user cluster task & args]
   (apply
    (task @tasks)
    host user cluster args))
 
 (defn exists?
-  "Check if a file exists"
+  "Check if a file or directory is exists"
+  {:arglists '([file])}
   [host user cluster file]
-  (= (:status (ssh host user cluster (str "test -e " file))) 0))
+  (zero? (:status (ssh host user cluster (str "test -e " file)))))
 
 
 (defn- unquote-cluster [args]
@@ -198,14 +221,20 @@
         args))
 
 (defmacro
-  ^{:doc "Define a cluster including some remote machines"
+  ^{:doc "Define a cluster including some remote machines,for example:
+           (defcluster :mycluster
+                     :user \"login\"
+                     :addresses [\"a.domain.com\" \"b.domain.com\"])
+
+      Please see https://github.com/killme2008/clojure-control/wiki/Define-clusters
+     "
     :arglists '([name & options])
     :added "0.1"}
   defcluster [name & args]
   `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
      (swap! clusters assoc ~name (assoc m# :name ~name))))
 
-(defmacro when-exit
+(defmacro ^:private when-exit
   ([test error]
      `(when-exit ~test ~error nil))
   ([test error else]
