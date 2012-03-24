@@ -1,4 +1,6 @@
 (ns leiningen.control
+  #^{ :doc "Clojure control leiningen plugin"
+         :author "Sun Ning <classicning@gmail.com>  Dennis Zhuang <killme2008@gmail.com>"}
   (:use [control.core :only [do-begin clusters]]
         [clojure.string :only [join]]
         [clojure.tools.cli :only [cli]]

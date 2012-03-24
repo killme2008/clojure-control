@@ -1,4 +1,6 @@
 (ns control.core
+  #^{ :doc "Clojure control core"
+         :author " Dennis Zhuang <killme2008@gmail.com>"}
   (:use [clojure.java.io :only [reader]]
         [clojure.java.shell :only [sh]]
         [clojure.string :only [join blank?]]

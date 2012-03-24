@@ -1,4 +1,5 @@
-(ns #^{:doc "A set of DSL for ssh, inspired by Fabric"
+(ns #^{:doc "A set of DSL for ssh, inspired by Fabric,
+                   please see https://github.com/killme2008/clojure-control/wiki/commands"
        :author "Sun Ning <classicning@gmail.com>  Dennis Zhuang<killme2008@gmail.com>"}
   control.commands)
 
