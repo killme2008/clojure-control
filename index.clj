@@ -4,7 +4,8 @@
    :name "control.commands",
    :author
    "Sun Ning <classicning@gmail.com>  Dennis Zhuang<killme2008@gmail.com>",
-   :doc "A set of DSL for ssh, inspired by Fabric"}
+   :doc
+   "A set of DSL for ssh, inspired by Fabric,\nplease see https://github.com/killme2008/clojure-control/wiki/commands"}
   {:source-url nil,
    :wiki-url "control.core-api.html",
    :name "control.core",
@@ -26,7 +27,7 @@
    :wiki-url "/control.commands-api.html#control.commands/append",
    :doc "Append a line to a file",
    :var-type "function",
-   :line 41,
+   :line 42,
    :file "src/control/commands.clj"}
   {:arglists ([file]),
    :name "cat",
@@ -36,7 +37,7 @@
    :wiki-url "/control.commands-api.html#control.commands/cat",
    :doc "cat a file",
    :var-type "function",
-   :line 88,
+   :line 89,
    :file "src/control/commands.clj"}
   {:arglists ([path & cmd]),
    :name "cd",
@@ -46,7 +47,7 @@
    :wiki-url "/control.commands-api.html#control.commands/cd",
    :doc "change current directory",
    :var-type "macro",
-   :line 11,
+   :line 12,
    :file "src/control/commands.clj"}
   {:arglists ([mod file]),
    :name "chmod",
@@ -56,7 +57,7 @@
    :wiki-url "/control.commands-api.html#control.commands/chmod",
    :doc "chmod [mod] [file]",
    :var-type "function",
-   :line 93,
+   :line 94,
    :file "src/control/commands.clj"}
   {:arglists ([file pat & opts]),
    :name "comm",
@@ -67,7 +68,7 @@
    :doc
    "Comments a line in a file with special character,default :char is \"#\"\nIt use sed function to replace the line matched pattern, :sudo is also valid",
    :var-type "function",
-   :line 73,
+   :line 74,
    :file "src/control/commands.clj"}
   {:arglists ([key val & cmd]),
    :name "env",
@@ -77,7 +78,7 @@
    :wiki-url "/control.commands-api.html#control.commands/env",
    :doc "declare a env variable for next command",
    :var-type "macro",
-   :line 21,
+   :line 22,
    :file "src/control/commands.clj"}
   {:arglists ([new-path & cmd]),
    :name "path",
@@ -87,7 +88,7 @@
    :wiki-url "/control.commands-api.html#control.commands/path",
    :doc "modify shell path",
    :var-type "macro",
-   :line 6,
+   :line 7,
    :file "src/control/commands.clj"}
   {:arglists ([pcmd & cmd]),
    :name "prefix",
@@ -98,7 +99,7 @@
    :doc
    "execute a prefix command, for instance, activate shell profile",
    :var-type "macro",
-   :line 16,
+   :line 17,
    :file "src/control/commands.clj"}
   {:arglists ([& cmds]),
    :name "run",
@@ -108,7 +109,7 @@
    :wiki-url "/control.commands-api.html#control.commands/run",
    :doc "simply run several commands",
    :var-type "function",
-   :line 26,
+   :line 27,
    :file "src/control/commands.clj"}
   {:arglists ([file before after & opts]),
    :name "sed",
@@ -119,7 +120,7 @@
    :doc
    "Use sed to replace strings matched pattern with options.Valid options include:\n:sudo   =>  true or false to use sudo,default is false.\n:flags   => sed options,default is nil.\n:limit    =>  sed limit,default is not limit.\n:backup  => backup file posfix,default is \".bak\"\nEquivalent to sed -i<backup> -r -e \"/<limit>/ s/<before>/<after>/<flags>g <filename>\".",
    :var-type "function",
-   :line 55,
+   :line 56,
    :file "src/control/commands.clj"}
   {:arglists ([cmd]),
    :name "sudo",
@@ -129,7 +130,7 @@
    :wiki-url "/control.commands-api.html#control.commands/sudo",
    :doc "run a command with sudo",
    :var-type "macro",
-   :line 34,
+   :line 35,
    :file "src/control/commands.clj"}
   {:arglists ([file pat & opts]),
    :name "uncomm",
@@ -139,9 +140,9 @@
    :wiki-url "/control.commands-api.html#control.commands/uncomm",
    :doc "uncomment a line in a file",
    :var-type "function",
-   :line 81,
+   :line 82,
    :file "src/control/commands.clj"}
-  {:arglists ([host user cluster task & args]),
+  {:arglists ([task & args]),
    :name "call",
    :namespace "control.core",
    :source-url nil,
@@ -150,7 +151,7 @@
    :doc
    "Call other tasks in deftask,for example:\n(call :ps \"java\")",
    :var-type "function",
-   :line 175,
+   :line 198,
    :file "src/control/core.clj"}
   {:arglists ([name & args]),
    :name "defcluster",
@@ -159,9 +160,10 @@
    :added "0.1",
    :raw-source-url nil,
    :wiki-url "/control.core-api.html#control.core/defcluster",
-   :doc "Define a cluster including some remote machines",
+   :doc
+   "Define a cluster including some remote machines,for example:\n      (defcluster :mycluster\n                :user \"login\"\n                :addresses [\"a.domain.com\" \"b.domain.com\"])\n\n Please see https://github.com/killme2008/clojure-control/wiki/Define-clusters\n",
    :var-type "macro",
-   :line 200,
+   :line 225,
    :file "src/control/core.clj"}
   {:arglists ([name & decl]),
    :name "deftask",
@@ -171,39 +173,50 @@
    :raw-source-url nil,
    :wiki-url "/control.core-api.html#control.core/deftask",
    :doc
-   "Define a task for executing on remote machines:\n(deftask :date \"Get date from remote machines\"\n          (ssh \"date\"))",
+   "Define a task for executing on remote machines:\n (deftask :date \"Get date from remote machines\"\n           (ssh \"date\"))\n\nPlease see https://github.com/killme2008/clojure-control/wiki/Define-tasks",
    :var-type "macro",
-   :line 143,
+   :line 164,
    :file "src/control/core.clj"}
-  {:arglists ([host user cluster file]),
+  {:arglists ([file]),
    :name "exists?",
    :namespace "control.core",
    :source-url nil,
    :raw-source-url nil,
    :wiki-url "/control.core-api.html#control.core/exists?",
-   :doc "Check if a file exists",
+   :doc "Check if a file or directory is exists",
    :var-type "function",
-   :line 183,
+   :line 207,
    :file "src/control/core.clj"}
-  {:arglists ([host user cluster local remote & opts]),
+  {:arglists ([src dst & opts]),
+   :name "rsync",
+   :namespace "control.core",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/control.core-api.html#control.core/rsync",
+   :doc
+   "Rsync local files to remote machine's files,for example:\n   (deftask :deploy \"scp files to remote machines\" []\n  (rsync \"src/\" \":/home/login\"))\n\n  Valid options:\n  :rsync-options  -- rsync options string\n",
+   :var-type "function",
+   :line 97,
+   :file "src/control/core.clj"}
+  {:arglists ([local remote & opts]),
    :name "scp",
    :namespace "control.core",
    :source-url nil,
    :raw-source-url nil,
    :wiki-url "/control.core-api.html#control.core/scp",
    :doc
-   "Copy local files to remote machines:\n(scp \"test.txt\" \"remote.txt\")\n(scp [\"1.txt\" \"2.txt\"] \"/home/deploy/\")",
+   "Copy local files to remote machines:\n (scp \"test.txt\" \"remote.txt\")\n (scp [\"1.txt\" \"2.txt\"] \"/home/deploy/\" :sudo true :mode 755)\n\nValid options:\n  :sudo  -- whether to copy files to remote machines as root\n  :mode -- files permission on remote machines\n  :scp-options -- scp options string",
    :var-type "function",
-   :line 103,
+   :line 118,
    :file "src/control/core.clj"}
-  {:arglists ([host user cluster cmd & opts]),
+  {:arglists ([cmd & opts]),
    :name "ssh",
    :namespace "control.core",
    :source-url nil,
    :raw-source-url nil,
    :wiki-url "/control.core-api.html#control.core/ssh",
    :doc
-   "Execute commands via ssh:\n(ssh \"date\")\n(ssh \"ps aux|grep java\")",
+   "Execute commands via ssh:\n(ssh \"date\")\n(ssh \"ps aux|grep java\")\n(ssh \"sudo apt-get update\" :sudo true)\n\nValid options:\n:sudo   whether to run commands as root,default is false\n:ssh-options  -- ssh options string",
    :var-type "function",
-   :line 73,
+   :line 72,
    :file "src/control/core.clj"})}

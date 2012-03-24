@@ -60,6 +60,8 @@ namespace.
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#control.core/exists?">exists?</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#control.core/rsync">rsync</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#control.core/scp">scp</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#control.core/ssh">ssh</a>
@@ -85,7 +87,7 @@ namespace.
   <hr />
   <h2 id="control.core/call">call</h2>
   <span id="var-type">function</span><br />
-  <pre id="var-usage">Usage: (call host user cluster task &amp; args)
+  <pre id="var-usage">Usage: (call task &amp; args)
 </pre>
   <pre id="var-docstr">Call other tasks in deftask,for example:
 (call :ps "java")</pre>
@@ -99,7 +101,13 @@ namespace.
   <span id="var-type">macro</span><br />
   <pre id="var-usage">Usage: (defcluster name &amp; args)
 </pre>
-  <pre id="var-docstr">Define a cluster including some remote machines</pre>
+  <pre id="var-docstr">Define a cluster including some remote machines,for example:
+      (defcluster :mycluster
+                :user "login"
+                :addresses ["a.domain.com" "b.domain.com"])
+
+ Please see <a href="https://github.com/killme2008/clojure-control/wiki/Define-clusters">https://github.com/killme2008/clojure-control/wiki/Define-clusters</a>
+</pre>
   <span class="var-added"><span id="content">Added in control version 0.1</span><br /></span>
   
   
@@ -111,8 +119,10 @@ namespace.
   <pre id="var-usage">Usage: (deftask name &amp; decl)
 </pre>
   <pre id="var-docstr">Define a task for executing on remote machines:
-(deftask :date "Get date from remote machines"
-          (ssh "date"))</pre>
+ (deftask :date "Get date from remote machines"
+           (ssh "date"))
+
+Please see <a href="https://github.com/killme2008/clojure-control/wiki/Define-tasks">https://github.com/killme2008/clojure-control/wiki/Define-tasks</a></pre>
   <span class="var-added"><span id="content">Added in control version 0.1</span><br /></span>
   
   
@@ -121,9 +131,26 @@ namespace.
   <hr />
   <h2 id="control.core/exists?">exists?</h2>
   <span id="var-type">function</span><br />
-  <pre id="var-usage">Usage: (exists? host user cluster file)
+  <pre id="var-usage">Usage: (exists? file)
 </pre>
-  <pre id="var-docstr">Check if a file exists</pre>
+  <pre id="var-docstr">Check if a file or directory is exists</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="control.core/rsync">rsync</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (rsync src dst &amp; opts)
+</pre>
+  <pre id="var-docstr">Rsync local files to remote machine's files,for example:
+   (deftask :deploy "scp files to remote machines" []
+  (rsync "src/" ":/home/login"))
+
+  Valid options:
+  :rsync-options  -- rsync options string
+</pre>
   
   
   
@@ -132,11 +159,16 @@ namespace.
   <hr />
   <h2 id="control.core/scp">scp</h2>
   <span id="var-type">function</span><br />
-  <pre id="var-usage">Usage: (scp host user cluster local remote &amp; opts)
+  <pre id="var-usage">Usage: (scp local remote &amp; opts)
 </pre>
   <pre id="var-docstr">Copy local files to remote machines:
-(scp "test.txt" "remote.txt")
-(scp ["1.txt" "2.txt"] "/home/deploy/")</pre>
+ (scp "test.txt" "remote.txt")
+ (scp ["1.txt" "2.txt"] "/home/deploy/" :sudo true :mode 755)
+
+Valid options:
+  :sudo  -- whether to copy files to remote machines as root
+  :mode -- files permission on remote machines
+  :scp-options -- scp options string</pre>
   
   
   
@@ -145,11 +177,16 @@ namespace.
   <hr />
   <h2 id="control.core/ssh">ssh</h2>
   <span id="var-type">function</span><br />
-  <pre id="var-usage">Usage: (ssh host user cluster cmd &amp; opts)
+  <pre id="var-usage">Usage: (ssh cmd &amp; opts)
 </pre>
   <pre id="var-docstr">Execute commands via ssh:
 (ssh "date")
-(ssh "ps aux|grep java")</pre>
+(ssh "ps aux|grep java")
+(ssh "sudo apt-get update" :sudo true)
+
+Valid options:
+:sudo   whether to run commands as root,default is false
+:ssh-options  -- ssh options string</pre>
   
   
   

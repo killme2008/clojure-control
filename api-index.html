@@ -98,15 +98,15 @@ Shortcuts:<br />
 </div><div id="index-body">
   <h2 id="D"><span id="section-head">D</span></h2>
   <pre>
-<span id="section-content"> <a href="control.core-api.html#control.core/defcluster">defcluster</a><span id="line-content">                   macro         control.core       Define a cluster including some remote machines.
-</span></span><span id="section-content"> <a href="control.core-api.html#control.core/deftask">deftask</a><span id="line-content">                      macro         control.core       Define a task for executing on remote machines: (d...
+<span id="section-content"> <a href="control.core-api.html#control.core/defcluster">defcluster</a><span id="line-content">                   macro         control.core       Define a cluster including some remote machines,fo...
+</span></span><span id="section-content"> <a href="control.core-api.html#control.core/deftask">deftask</a><span id="line-content">                      macro         control.core       Define a task for executing on remote machines: (...
 </span></span>
   </pre>
 </div><div id="index-body">
   <h2 id="E"><span id="section-head">E</span></h2>
   <pre>
 <span id="section-content"> <a href="control.commands-api.html#control.commands/env">env</a><span id="line-content">                          macro         control.commands   declare a env variable for next command.
-</span></span><span id="section-content"> <a href="control.core-api.html#control.core/exists?">exists?</a><span id="line-content">                      function      control.core       Check if a file exists.
+</span></span><span id="section-content"> <a href="control.core-api.html#control.core/exists?">exists?</a><span id="line-content">                      function      control.core       Check if a file or directory is exists.
 </span></span>
   </pre>
 </div><div id="index-body">
@@ -174,13 +174,14 @@ Shortcuts:<br />
 </div><div id="index-body">
   <h2 id="R"><span id="section-head">R</span></h2>
   <pre>
-<span id="section-content"> <a href="control.commands-api.html#control.commands/run">run</a><span id="line-content">                          function      control.commands   simply run several commands.
+<span id="section-content"> <a href="control.core-api.html#control.core/rsync">rsync</a><span id="line-content">                        function      control.core       Rsync local files to remote machine's files,for ex...
+</span></span><span id="section-content"> <a href="control.commands-api.html#control.commands/run">run</a><span id="line-content">                          function      control.commands   simply run several commands.
 </span></span>
   </pre>
 </div><div id="index-body">
   <h2 id="S"><span id="section-head">S</span></h2>
   <pre>
-<span id="section-content"> <a href="control.core-api.html#control.core/scp">scp</a><span id="line-content">                          function      control.core       Copy local files to remote machines: (scp "test.tx...
+<span id="section-content"> <a href="control.core-api.html#control.core/scp">scp</a><span id="line-content">                          function      control.core       Copy local files to remote machines: (scp "test.t...
 </span></span><span id="section-content"> <a href="control.commands-api.html#control.commands/sed">sed</a><span id="line-content">                          function      control.commands   Use sed to replace strings matched pattern with op...
 </span></span><span id="section-content"> <a href="control.core-api.html#control.core/ssh">ssh</a><span id="line-content">                          function      control.core       Execute commands via ssh: (ssh "date") (ssh "ps au...
 </span></span><span id="section-content"> <a href="control.commands-api.html#control.commands/sudo">sudo</a><span id="line-content">                         macro         control.commands   run a command with sudo.
