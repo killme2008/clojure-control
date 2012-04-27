@@ -57,7 +57,7 @@
   `(let ~(reduce #(conj %1 %2 `(ns-resolve '~ns '~%2)) [] fns)
 	 ~@tests))
 
-(with-private-fns [control.core [perform spawn await-process user-at-host? find-client-options make-cmd-array]]
+(with-private-fns [control.core [perform spawn await-process user-at-host? find-client-options make-cmd-array *global-options*]]
   (deftest test-make-cmd-array
 	(is (= ["ssh" "-v" "-p 44" "user@host"] (make-cmd-array "ssh" ["-v" "-p 44"] ["user@host"])))
 	(is (= ["rsync" "-arz" "--delete" "src" "user@host::share"] (make-cmd-array "rsync" ["-arz" "--delete"] ["src" "user@host::share"]))))
@@ -72,11 +72,22 @@
 	  (is (f {:user "user" :host "host"}))
 	  (is (not (f {:user "hello" :host "host"}))))
 	)
+  (deftest test-set-options!
+    (is (nil?  (:ssh-options @@*global-options*)))
+    (set-options! :ssh-options "-o ConnectTimeout=3000")
+    (is (= 1 (count @@*global-options*)))
+    (is (= "-o ConnectTimeout=3000" (:ssh-options @@*global-options*)))
+    (set-options! :ssh-options nil))
   (deftest test-find-client-options
-	(let [cluster {:ssh-options "-abc" :clients [ {:user "login" :host "a.domain.com" :ssh-options "-def"} ]}]
-	  (is (= "-abc" (find-client-options "b.domain.com" "login" cluster :ssh-options)))
-	  (is (= "-abc" (find-client-options "a.domain.com" "alogin" cluster :ssh-options)))
-	  (is (= "-def" (find-client-options "a.domain.com" "login" cluster :ssh-options))))))
+	(let [cluster1 {:ssh-options "-abc" :clients [ {:user "login" :host "a.domain.com" :ssh-options "-def"} ]}
+            cluster2 {:addresses ["a.domain.com"] :user "login"}]
+	  (is (= "-abc" (find-client-options "b.domain.com" "login" cluster1 :ssh-options)))
+	  (is (= "-abc" (find-client-options "a.domain.com" "alogin" cluster1 :ssh-options)))
+	  (is (= "-def" (find-client-options "a.domain.com" "login" cluster1 :ssh-options)))
+      (is (nil? (find-client-options "a.domain.com" "login" cluster2 :ssh-options)))
+      (set-options! :ssh-options "-o ConnectTimeout=3000")
+      (is (= "-o ConnectTimeout=3000" (find-client-options "a.domain.com" "login" cluster2 :ssh-options)))
+      (set-options! :ssh-options nil))))
 
 (defn not-nil?
   [x]

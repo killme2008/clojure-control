@@ -13,6 +13,8 @@
 (def ^:private bash-bold "\033[1m")
 (def ^:private bash-redbold "\033[1;31m")
 (def ^:private bash-greenbold "\033[1;32m")
+;;Global options for ssh,scp and rsync
+(def ^{:dynamic true :private true} *global-options* (atom {}))
 
 (defmacro ^:private cli-bash-bold [& content]
   `(if *enable-color*
@@ -59,15 +61,32 @@
   (fn [m]
     (and (= (:user m) user) (= (:host m) host))))
 
-(defn- find-client-options [host user cluster sym]
-  (let [m (first (filter (user-at-host? host user) (:clients cluster)))]
-    (or (sym m) (sym cluster))))
+(defn- find-client-options [host user cluster opt]
+  (let [opt (keyword opt)
+        m (first (filter (user-at-host? host user) (:clients cluster)))]
+    (or (opt m) (opt cluster) (opt @*global-options*))))
 
 (defn- make-cmd-array
   [cmd options others]
   (if (vector? options)
     (concat (cons cmd options) others)
     (cons cmd (cons options others))))
+
+(defn set-options!
+  "Set global options for ssh,scp and rsync,
+   key and value  could be:
+
+      Key                               Value
+  :ssh-options        a ssh options string,for example \"-o ConnectTimeout=3000\"
+  :scp-options       a scp options string
+  :rsync-options    a rsync options string.
+
+  Example:
+        (set-options! :ssh-options \"-o ConnectTimeout=3000\")
+
+  "
+  [key value]
+  (swap! *global-options* assoc key value))
 
 (defn ssh
   "Execute commands via ssh:
