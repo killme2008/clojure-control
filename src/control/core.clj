@@ -305,5 +305,4 @@
                               (do-begin (cons (name includes) (next args)))))))))))
 
 (defn begin []
-  (do-begin *command-line-args*)
-  (shutdown-agents))
+  (do-begin *command-line-args*))
