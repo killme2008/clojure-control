@@ -1,6 +1,6 @@
 (ns control.core
   #^{ :doc "Clojure control core"
-         :author " Dennis Zhuang <killme2008@gmail.com>"}
+     :author " Dennis Zhuang <killme2008@gmail.com>"}
   (:use [clojure.java.io :only [reader]]
         [clojure.java.shell :only [sh]]
         [clojure.string :only [join blank?]]
@@ -55,7 +55,10 @@
     execp))
 
 (defn ssh-client [host user]
-  (str user "@" host))
+  (let [user (or user (:user *global-options*))]
+    (if (not user)
+      (throw (IllegalArgumentException. "user is nil")))
+    (str user "@" host)) )
 
 (defn-  user-at-host? [host user]
   (fn [m]
@@ -80,6 +83,7 @@
   :ssh-options        a ssh options string,for example \"-o ConnectTimeout=3000\"
   :scp-options       a scp options string
   :rsync-options    a rsync options string.
+  :user                    global user for cluster,if cluster do not have :user ,it will use this by default.
 
   Example:
         (set-options! :ssh-options \"-o ConnectTimeout=3000\")
@@ -233,11 +237,11 @@
 (defn- unquote-cluster [args]
   (walk (fn [item]
           (cond (and (seq? item) (= `unquote (first item)))
-                ,(second item)
+                (second item)
                 (or (seq? item) (symbol? item))
-                ,(list 'quote item)
+                (list 'quote item)
                 :else
-                ,(unquote-cluster item)))
+                (unquote-cluster item)))
         identity
         args))
 
