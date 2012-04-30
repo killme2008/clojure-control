@@ -1,7 +1,7 @@
 (ns leiningen.control
   #^{ :doc "Clojure control leiningen plugin"
          :author "Sun Ning <classicning@gmail.com>  Dennis Zhuang <killme2008@gmail.com>"}
-  (:use [control.core :only [do-begin clusters]]
+  (:use [control.core :only [do-begin clusters ssh-client]]
         [clojure.string :only [join]]
         [clojure.tools.cli :only [cli]]
         [leiningen.help :only [help-for]]
@@ -112,14 +112,17 @@
   (do 
     (load-control-file project)
     (if-let [cluster-name (first args)]
-      (let [user (:user ((keyword cluster-name) @clusters))]
+      (let [ cluster ((keyword cluster-name) @clusters)
+             user (:user cluster)]
         (doseq
-            [c (:clients ((keyword cluster-name) @clusters))]
-          (println (str (:user c) "@" (:host c))))
+            [c (:clients cluster)]
+          (println (ssh-client (:host c)  (or (:user c) user))))
         (doseq
-            [a (:addresses ((keyword cluster-name) @clusters))]
-          (println (str user "@" a)))))))
-
+            [a (:addresses cluster)]
+          (println (ssh-client a user)))
+        (doseq
+            [c (:includes cluster)]
+          (println (str "Cluster " c)))))))
 
 (defn control
   "Leiningen plugin for Clojure-Control"
