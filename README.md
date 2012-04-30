@@ -16,12 +16,7 @@ And then use lein to create a control project,for example
 
     lein new mycontrol
 
-Then edit `mycontrol/project.clj` to add control dependency:
-
-     [control "0.3.2"]  ;clojure 1.3
-     [control "0.3.1"]  ;clojure 1.2
-
-Type `lein deps` to resolve dependencies.Creating a control file by:
+Creating a control file by:
 
      cd mycontrol
      lein control init
