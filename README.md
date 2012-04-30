@@ -9,8 +9,8 @@ The idea came from [node-control](https://github.com/tsmith/node-control).
 ## Gettting started
 I recommend you to use clojure-control with lein control plugin,you can install the plugin by:
 
-    lein plugin install control 0.3.2           #For clojure 1.3
-    lein plugin install control 0.3.1           #For clojure 1.2
+    lein plugin install control 0.3.3           #For clojure 1.4
+    lein plugin install control 0.3.1           #For clojure 1.2, some features are not valid in this version.Recommend using 0.3.3
 
 And then use lein to create a control project,for example
 
