@@ -194,12 +194,13 @@
     :arglists '([name doc-string? [params*] body])
     :added "0.1"}
   deftask [name & decl ]
-  (let [m (if (string? (first decl))
-            (next decl)
-            decl)
-        arguments (first m)
-        body (next m)
-        new-body (postwalk (fn [item]
+  (let [name (keyword name)
+          m (if (string? (first decl))
+              (next decl)
+              decl)
+          arguments (first m)
+          body (next m)
+          new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
                                  (if (cmd system-functions)
