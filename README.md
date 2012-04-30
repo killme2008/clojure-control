@@ -44,6 +44,15 @@ Output:
 
 You may have to type password when running this task. You can setup ssh public keys to avoid typing a password when logining remote machines.please visit [HOWTO: set up ssh keys](http://pkeck.myweb.uga.edu/ssh/)
 
+Every task's running result is a map contains output and status,you can get them by:
+
+     (let [rt (ssh "date")]
+       (println (:status rt))
+       (println (:stdout rt))
+       (println (:stderr rt)))
+
+You can do whatever you want with these values,for example,checking status is right or writing standard output to a file.
+
 ##Documents
 
 * [Wiki](https://github.com/killme2008/clojure-control/wiki)
