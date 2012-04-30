@@ -64,6 +64,8 @@ namespace.
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#control.core/scp">scp</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#control.core/set-options!">set-options!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#control.core/ssh">ssh</a>
     </div>
     <br />
@@ -169,6 +171,29 @@ Valid options:
   :sudo  -- whether to copy files to remote machines as root
   :mode -- files permission on remote machines
   :scp-options -- scp options string</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="control.core/set-options!">set-options!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (set-options! key value)
+</pre>
+  <pre id="var-docstr">Set global options for ssh,scp and rsync,
+ key and value  could be:
+
+    Key                               Value
+:ssh-options        a ssh options string,for example "-o ConnectTimeout=3000"
+:scp-options       a scp options string
+:rsync-options    a rsync options string.
+:user                    global user for cluster,if cluster do not have :user ,it will use this by default.
+
+Example:
+      (set-options! :ssh-options "-o ConnectTimeout=3000")
+
+</pre>
   
   
   
