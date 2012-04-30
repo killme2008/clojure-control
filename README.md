@@ -52,6 +52,9 @@ Every task's running result is a map contains output and status,you can get them
        (println (:stderr rt)))
 
 You can do whatever you want with these values,for example,checking status is right or writing standard output to a file.
+
+##Ping mysql
+
 A practical task to ping mysql:
 
 	(deftask :ping-mysql  []
