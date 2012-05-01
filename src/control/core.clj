@@ -266,8 +266,9 @@
     :arglists '([name & options])
     :added "0.1"}
   defcluster [name & args]
-  `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
-     (swap! clusters assoc ~name (assoc m# :name ~name))))
+  (let [name (keyword name)]
+    `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
+     (swap! clusters assoc ~name (assoc m# :name ~name)))))
 
 (defmacro ^:private when-exit
   ([test error]
