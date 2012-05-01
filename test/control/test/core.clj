@@ -75,19 +75,21 @@
   (deftest test-set-options!
     (is (nil?  (:ssh-options @@*global-options*)))
     (set-options! :ssh-options "-o ConnectTimeout=3000")
+    (println @@*global-options*)
     (is (= 1 (count @@*global-options*)))
     (is (= "-o ConnectTimeout=3000" (:ssh-options @@*global-options*)))
-    (set-options! :ssh-options nil))
+    (clear-options!))
   (deftest test-find-client-options
 	(let [cluster1 {:ssh-options "-abc" :clients [ {:user "login" :host "a.domain.com" :ssh-options "-def"} ]}
-            cluster2 {:addresses ["a.domain.com"] :user "login"}]
+            cluster2 {:addresses ["a.domain.com"]}]
 	  (is (= "-abc" (find-client-options "b.domain.com" "login" cluster1 :ssh-options)))
 	  (is (= "-abc" (find-client-options "a.domain.com" "alogin" cluster1 :ssh-options)))
 	  (is (= "-def" (find-client-options "a.domain.com" "login" cluster1 :ssh-options)))
       (is (nil? (find-client-options "a.domain.com" "login" cluster2 :ssh-options)))
-      (set-options! :ssh-options "-o ConnectTimeout=3000")
-      (is (= "-o ConnectTimeout=3000" (find-client-options "a.domain.com" "login" cluster2 :ssh-options)))
-      (set-options! :ssh-options nil))))
+      (set-options! :ssh-options "-o ConnectTimeout=3000" :user "deploy")
+      (is (= "-o ConnectTimeout=3000" (find-client-options "a.domain.com" nil cluster2 :ssh-options)))
+      (is (= "deploy@a.domain.com" (ssh-client "a.domain.com" nil)))
+      (clear-options!))))
 
 (defn not-nil?
   [x]

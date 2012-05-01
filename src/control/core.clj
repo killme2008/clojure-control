@@ -89,8 +89,17 @@
         (set-options! :ssh-options \"-o ConnectTimeout=3000\")
 
   "
-  [key value]
-  (swap! *global-options* assoc key value))
+  ([key value]
+     (swap! *global-options* assoc key value))
+  ([key value & kvs]
+     (set-options! key value)
+     (if kvs
+       (recur (first kvs) (second kvs) (next kvs)))))
+
+(defn clear-options!
+  "Clear global options"
+  []
+  (reset! *global-options* {}))
 
 (defn ssh
   "Execute commands via ssh:
@@ -195,12 +204,12 @@
     :added "0.1"}
   deftask [name & decl ]
   (let [name (keyword name)
-          m (if (string? (first decl))
-              (next decl)
-              decl)
-          arguments (first m)
-          body (next m)
-          new-body (postwalk (fn [item]
+        m (if (string? (first decl))
+            (next decl)
+            decl)
+        arguments (first m)
+        body (next m)
+        new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
                                  (if (cmd system-functions)
