@@ -89,12 +89,8 @@
         (set-options! :ssh-options \"-o ConnectTimeout=3000\")
 
   "
-  ([key value]
-     (swap! *global-options* assoc key value))
-  ([key value & kvs]
-     (set-options! key value)
-     (if kvs
-       (recur (first kvs) (second kvs) (next kvs)))))
+  [key value & kvs]
+  (swap! *global-options* #(apply assoc (list* % key value kvs))))
 
 (defn clear-options!
   "Clear global options"
@@ -268,7 +264,7 @@
   defcluster [name & args]
   (let [name (keyword name)]
     `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
-     (swap! clusters assoc ~name (assoc m# :name ~name)))))
+       (swap! clusters assoc ~name (assoc m# :name ~name)))))
 
 (defmacro ^:private when-exit
   ([test error]
