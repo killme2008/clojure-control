@@ -7,7 +7,7 @@
         [clojure.walk :only [walk postwalk]]))
 
 (def ^:dynamic *enable-color* true)
-(def ^{:dynamic true} *enable-logging* true)
+(def ^:dynamic *enable-logging* true)
 (def ^:dynamic *debug* false)
 (def ^:private bash-reset "\033[0m")
 (def ^:private bash-bold "\033[1m")
@@ -156,7 +156,7 @@
                           rsync-options
                           [src (str (ssh-client host user) ":" dst)]))))
 
-(def ^{:dynamic true} *tmp-dir* nil)
+(def ^:dynamic *tmp-dir* nil)
 
 (defn scp
   "Copy local files to remote machines:
