@@ -16,6 +16,17 @@
 ;;Global options for ssh,scp and rsync
 (def ^{:dynamic true :private true} *global-options* (atom {}))
 
+(defn ^:private check-valid-options
+  "Throws an exception if the given option map contains keys not listed
+  as valid, else returns nil."
+  [options & valid-keys]
+  (when (seq (apply disj (apply hash-set (keys options)) valid-keys))
+    (throw
+     (IllegalArgumentException.
+      (apply str "Only these options are valid: "
+             (first valid-keys)
+             (map #(str ", " %) (rest valid-keys)))))))
+
 (defmacro ^:private cli-bash-bold [& content]
   `(if *enable-color*
      (str bash-bold ~@content bash-reset)
@@ -90,8 +101,10 @@
 
   "
   [key value & kvs]
-  (swap! *global-options* #(apply assoc (list* % key value kvs))))
-
+  (let [options (apply hash-map key value kvs)]
+    (check-valid-options options :user :ssh-options :scp-options :rsync-options)
+    (swap! *global-options* merge options)))
+  
 (defn clear-options!
   "Clear global options"
   []
@@ -115,6 +128,7 @@
               (str "sudo " cmd)
               cmd)
         ssh-options (or (:ssh-options m) (find-client-options host user cluster :ssh-options))]
+    (check-valid-options m :sudo :ssh-options :mode :scp-options)
 	(log-with-tag host "ssh" ssh-options cmd)
 	(exec host
           user
@@ -134,6 +148,7 @@
   [host user cluster src dst & opts]
   (let [m (apply hash-map opts)
         rsync-options (or (:rsync-options m) (find-client-options host user cluster :rsync-options))]
+    (check-valid-options m :rsync-options)
     (log-with-tag host "rsync" rsync-options (str src " ==>" dst))
     (exec host
           user
@@ -166,6 +181,7 @@
         tmp (if use-tmp
               (or *tmp-dir* (str "/tmp/control-" (System/currentTimeMillis) "/"))
               remote)]
+    (check-valid-options m :scp-options :sudo :mode :ssh-options)
     (log-with-tag host "scp" scp-options
       (join " " (concat files [ " ==> " tmp])))
     (if use-tmp
@@ -300,6 +316,7 @@
                    includes (:includes cluster)
                    debug (:debug cluster)
                    log (:log cluster)]
+               (check-valid-options cluster :user :clients :addresses :parallel :includes :debug :log)
                (when-exit (nil? task)
                           (str "No task named " (name task-name)))
                (when-exit (and (empty? addresses)
