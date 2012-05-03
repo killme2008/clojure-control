@@ -230,7 +230,7 @@
                                item))
                            body)]
     (if (not (vector? arguments))
-      (throw (IllegalArgumentException. "Task must have arguments even if []")))
+      (throw (IllegalArgumentException. "Task must have arguments vector")))
     (if *debug*
       (prn name "new-body:" new-body))
     `(swap! tasks
