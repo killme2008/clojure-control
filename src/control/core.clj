@@ -42,7 +42,6 @@
      (str bash-greenbold ~@content bash-reset)
      (str ~@content)))
 
-
 (defstruct ^:private ExecProcess  :stdout :stderr :status)
 
 (defn gen-log [host tag content]
@@ -51,7 +50,7 @@
        (join " " content)))
 
 (defn-  log-with-tag [host tag & content]
-  (if (and *enable-logging* (not (blank? (join " " content))))
+  (when (and *enable-logging* (not (blank? (join " " content))))
     (println (gen-log host tag content))))
 
 (defn  ^:dynamic  exec [host user cmdcol]
@@ -67,7 +66,7 @@
 
 (defn ssh-client [host user]
   (let [user (or user (:user @*global-options*))]
-    (if (not user)
+    (when-not user
       (throw (IllegalArgumentException. "user is nil")))
     (str user "@" host)) )
 
@@ -184,14 +183,14 @@
     (check-valid-options m :scp-options :sudo :mode :ssh-options)
     (log-with-tag host "scp" scp-options
       (join " " (concat files [ " ==> " tmp])))
-    (if use-tmp
+    (when use-tmp
       (ssh host user cluster (str "mkdir -p " tmp)))
     (let [rt (exec host
                    user
                    (make-cmd-array "scp"
                                    scp-options
                                    (concat files [(str (ssh-client host user) ":" tmp)])))]
-      (if mode
+      (when mode
         (apply ssh host user cluster (str "chmod " mode  " " tmp "*") opts))
       (if use-tmp
         (apply ssh host user cluster (str "mv "  tmp "* " remote " ; rm -rf " tmp) opts)
@@ -229,9 +228,9 @@
                                    item))
                                item))
                            body)]
-    (if (not (vector? arguments))
-      (throw (IllegalArgumentException. "Task must have arguments vector")))
-    (if *debug*
+    (when-not (vector? arguments)
+      (throw (IllegalArgumentException. "It's arguments must be a vector")))
+    (when *debug*
       (prn name "new-body:" new-body))
     `(swap! tasks
             assoc
@@ -291,7 +290,7 @@
         ~else)))
 
 (defn- perform [host user cluster task taskName arguments]
-  (do (if *enable-logging* (println (cli-bash-bold "Performing " (name taskName) " for " (ssh-client host user))))
+  (do (when *enable-logging* (println (cli-bash-bold "Performing " (name taskName) " for " (ssh-client host user))))
       (apply task host user cluster arguments)))
 
 (defn- arg-count [f]
@@ -331,14 +330,14 @@
                                  " just needs "
                                  task-arg-count
                                  " arguments")))
-               (binding [*enable-logging* (if (nil? log) true log)
+               (binding [*enable-logging* (or log true)
                          *debug* debug]
-                 (if *enable-logging*
+                 (when *enable-logging*
                    (println  (str bash-bold
                                   "Performing "
                                   (name cluster-name)
                                   bash-reset
-                                  (if parallel
+                                  (when parallel
                                     " in parallel"))))
                  (let [map-fn (if parallel pmap map)
                        a (doall (map-fn (fn [addr] [addr (perform addr user cluster task task-name task-args)])
