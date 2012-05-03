@@ -213,8 +213,8 @@
 "
     :arglists '([name doc-string? [params*] body])
     :added "0.1"}
-  deftask [name & decl ]
-  (let [name (keyword name)
+  deftask [tname & decl ]
+  (let [tname (keyword tname)
         m (if (string? (first decl))
             (next decl)
             decl)
@@ -229,12 +229,12 @@
                                item))
                            body)]
     (when-not (vector? arguments)
-      (throw (IllegalArgumentException. "It's arguments must be a vector")))
+      (throw (IllegalArgumentException. (format "Task %s's arguments must be a vector" (name tname)))))
     (when *debug*
-      (prn name "new-body:" new-body))
+      (prn tname "new-body:" new-body))
     `(swap! tasks
             assoc
-            ~name
+            ~tname
             ~(list 'fn
                    (vec (concat '[host user cluster] arguments))
                    (cons 'do new-body)))))
@@ -274,12 +274,12 @@
 
       Please see https://github.com/killme2008/clojure-control/wiki/Define-clusters
      "
-    :arglists '([name & options])
+    :arglists '([cname & options])
     :added "0.1"}
-  defcluster [name & args]
-  (let [name (keyword name)]
+  defcluster [cname & args]
+  (let [cname (keyword cname)]
     `(let [m# (apply hash-map ~(cons 'list (unquote-cluster args)))]
-       (swap! clusters assoc ~name (assoc m# :name ~name)))))
+       (swap! clusters assoc ~cname (assoc m# :name ~cname)))))
 
 (defmacro ^:private when-exit
   ([test error]
