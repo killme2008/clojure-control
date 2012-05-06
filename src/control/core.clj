@@ -94,6 +94,7 @@
   :scp-options       a scp options string
   :rsync-options    a rsync options string.
   :user                    global user for cluster,if cluster do not have :user ,it will use this by default.
+  :parallel               if to execute task on remote machines in parallel,default is false
 
   Example:
         (set-options! :ssh-options \"-o ConnectTimeout=3000\")
@@ -101,7 +102,7 @@
   "
   [key value & kvs]
   (let [options (apply hash-map key value kvs)]
-    (check-valid-options options :user :ssh-options :scp-options :rsync-options)
+    (check-valid-options options :user :ssh-options :scp-options :rsync-options :parallel)
     (swap! *global-options* merge options)))
   
 (defn clear-options!
@@ -300,6 +301,9 @@
       (alength p)
       3)))
 
+(defn- is-parallel? [cluster]
+  (or (:parallel cluster) (:parallel @*global-options*)))
+
 (defn do-begin [args]
   (when-exit (< (count args) 2)
              "Please offer cluster and task name"
@@ -307,7 +311,7 @@
                    task-name (keyword (second args))
                    task-args (next (next args))
                    cluster (cluster-name @clusters)
-                   parallel (:parallel cluster)
+                   parallel (is-parallel? cluster)
                    user (:user cluster)
                    addresses (:addresses cluster)
                    clients (:clients cluster)
