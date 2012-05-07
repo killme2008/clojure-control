@@ -225,7 +225,7 @@
                              (if (list? item)
                                (let [cmd (first item)]
                                  (if (cmd system-functions)
-                                   (list* cmd  'host 'user 'cluster (rest item))
+                                   (list* cmd  '&host '&user 'cluster (rest item))
                                    item))
                                item))
                            body)]
