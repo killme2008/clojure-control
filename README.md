@@ -53,9 +53,9 @@ Every task's running result is a map contains output and status,you can get them
 
 You can do whatever you want with these values,for example,checking status is right or writing standard output to a file.
 
-##Ping mysql
+##Some practical tasks
 
-A practical task to ping mysql:
+A task to ping mysql:
 
 	(deftask :ping-mysql  []
 	  (let [stdout (:stdout (ssh "mysqladmin -u root  -p'password' ping"))]
@@ -63,7 +63,18 @@ A practical task to ping mysql:
       	  1
 		  0)))
 
+A task to deploy application:
 
+    (deftask :deploy-app []
+          (local "tar zcvf app.tar.gz app/")
+          (scp "app.tar.gz" "/home/app/")
+          (ssh
+               (run 
+                   (cd "/home/app"
+				      (run "tar zxvf app.tar.gz")
+       				  (env "JAVA_OPTS" "-XMaxPermSize=128m"
+                             (run "bin/app.sh restart"))))))
+                       
 ##Documents
 
 * [Wiki](https://github.com/killme2008/clojure-control/wiki)
