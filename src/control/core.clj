@@ -7,7 +7,7 @@
         [clojure.walk :only [walk postwalk]]))
 
 (def ^:dynamic *enable-color* true)
-(def ^:dynamic *enable-logging* true)
+(def ^{:dynamic true} *enable-logging* true)
 (def ^:dynamic *debug* false)
 (def ^:private bash-reset "\033[0m")
 (def ^:private bash-bold "\033[1m")
@@ -169,7 +169,7 @@
                           rsync-options
                           [src (str (ssh-client host user) ":" dst)]))))
 
-(def ^:dynamic *tmp-dir* nil)
+(def ^{:dynamic true} *tmp-dir* nil)
 
 (defn scp
   "Copy local files to remote machines:
@@ -250,7 +250,7 @@
             assoc
             ~tname
             ~(list 'fn
-                   (vec (concat '[host user cluster] arguments))
+                   (vec (concat '[&host &user cluster] arguments))
                    (cons 'do new-body)))))
 
 (defn call
@@ -332,7 +332,7 @@
                    includes (:includes cluster)
                    debug (:debug cluster)
                    log (:log cluster)]
-               (check-valid-options cluster :user :clients :addresses :parallel :includes :debug :log)
+               (check-valid-options cluster :user :clients :addresses :parallel :includes :debug :log :ssh-options :scp-options :rsync-options :name)
                (when-exit (nil? task)
                           (str "No task named " (name task-name)))
                (when-exit (and (empty? addresses)
