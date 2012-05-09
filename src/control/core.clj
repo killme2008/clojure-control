@@ -53,6 +53,19 @@
   (when (and *enable-logging* (not (blank? (join " " content))))
     (println (gen-log host tag content))))
 
+(defn local [ cmd ]
+  "Execute command on local machine"
+  (when *enable-logging* (println (cli-bash-bold "Performing " cmd " on local")))
+  (let [rt (apply sh ["sh" "-c" cmd])
+        status (:exit rt)
+        stdout (:out rt)
+        stderr (:err rt)
+        execp (struct-map ExecProcess :stdout stdout :stderr stderr :status status)]
+    (log-with-tag "[Local]" "stdout" (:stdout execp))
+    (log-with-tag "[Local]" "stderr" (:stderr execp))
+    (log-with-tag "[Local]" "exit" status)
+    execp))
+
 (defn  ^:dynamic  exec [host user cmdcol]
   (let [rt (apply sh (filter (complement nil?) cmdcol))
         status (:exit rt)
@@ -104,7 +117,7 @@
   (let [options (apply hash-map key value kvs)]
     (check-valid-options options :user :ssh-options :scp-options :rsync-options :parallel)
     (swap! *global-options* merge options)))
-  
+
 (defn clear-options!
   "Clear global options"
   []

@@ -23,6 +23,9 @@
   (is (= "apple@localhost" (ssh-client "localhost" "apple")))
   (is (= "dennis@a.domain.com" (ssh-client "a.domain.com" "dennis"))))
 
+(deftest test-local
+  (is (= "1\n" (:stdout (local "echo 1"))))
+  )
 
 (deftest test-task
   (is (= 0 (count @tasks)))
