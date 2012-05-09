@@ -67,7 +67,7 @@
     execp))
 
 (defn  ^:dynamic  exec [host user cmdcol]
-  (let [rt (apply sh (filter (complement nil?) cmdcol))
+  (let [rt (apply sh (remove nil? cmdcol))
         status (:exit rt)
         stdout (:out rt)
         stderr (:err rt)
