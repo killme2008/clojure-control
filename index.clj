@@ -151,9 +151,19 @@
    :doc
    "Call other tasks in deftask,for example:\n(call :ps \"java\")",
    :var-type "function",
-   :line 222,
+   :line 256,
    :file "src/control/core.clj"}
-  {:arglists ([name & args]),
+  {:arglists ([]),
+   :name "clear-options!",
+   :namespace "control.core",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/control.core-api.html#control.core/clear-options!",
+   :doc "Clear global options",
+   :var-type "function",
+   :line 121,
+   :file "src/control/core.clj"}
+  {:arglists ([cname & args]),
    :name "defcluster",
    :namespace "control.core",
    :source-url nil,
@@ -163,9 +173,9 @@
    :doc
    "Define a cluster including some remote machines,for example:\n      (defcluster :mycluster\n                :user \"login\"\n                :addresses [\"a.domain.com\" \"b.domain.com\"])\n\n Please see https://github.com/killme2008/clojure-control/wiki/Define-clusters\n",
    :var-type "macro",
-   :line 249,
+   :line 283,
    :file "src/control/core.clj"}
-  {:arglists ([name & decl]),
+  {:arglists ([tname & decl]),
    :name "deftask",
    :namespace "control.core",
    :source-url nil,
@@ -175,7 +185,7 @@
    :doc
    "Define a task for executing on remote machines:\n (deftask :date \"Get date from remote machines\"\n           (ssh \"date\"))\n\nPlease see https://github.com/killme2008/clojure-control/wiki/Define-tasks",
    :var-type "macro",
-   :line 187,
+   :line 221,
    :file "src/control/core.clj"}
   {:arglists ([file]),
    :name "exists?",
@@ -185,7 +195,7 @@
    :wiki-url "/control.core-api.html#control.core/exists?",
    :doc "Check if a file or directory is exists",
    :var-type "function",
-   :line 231,
+   :line 265,
    :file "src/control/core.clj"}
   {:arglists ([src dst & opts]),
    :name "rsync",
@@ -196,7 +206,7 @@
    :doc
    "Rsync local files to remote machine's files,for example:\n   (deftask :deploy \"scp files to remote machines\" []\n  (rsync \"src/\" \":/home/login\"))\n\n  Valid options:\n  :rsync-options  -- rsync options string\n",
    :var-type "function",
-   :line 120,
+   :line 152,
    :file "src/control/core.clj"}
   {:arglists ([local remote & opts]),
    :name "scp",
@@ -207,18 +217,18 @@
    :doc
    "Copy local files to remote machines:\n (scp \"test.txt\" \"remote.txt\")\n (scp [\"1.txt\" \"2.txt\"] \"/home/deploy/\" :sudo true :mode 755)\n\nValid options:\n  :sudo  -- whether to copy files to remote machines as root\n  :mode -- files permission on remote machines\n  :scp-options -- scp options string",
    :var-type "function",
-   :line 141,
+   :line 174,
    :file "src/control/core.clj"}
-  {:arglists ([key value]),
+  {:arglists ([key value & kvs]),
    :name "set-options!",
    :namespace "control.core",
    :source-url nil,
    :raw-source-url nil,
    :wiki-url "/control.core-api.html#control.core/set-options!",
    :doc
-   "Set global options for ssh,scp and rsync,\n key and value  could be:\n\n    Key                               Value\n:ssh-options        a ssh options string,for example \"-o ConnectTimeout=3000\"\n:scp-options       a scp options string\n:rsync-options    a rsync options string.\n:user                    global user for cluster,if cluster do not have :user ,it will use this by default.\n\nExample:\n      (set-options! :ssh-options \"-o ConnectTimeout=3000\")\n\n",
+   "Set global options for ssh,scp and rsync,\n key and value  could be:\n\n    Key                               Value\n:ssh-options        a ssh options string,for example \"-o ConnectTimeout=3000\"\n:scp-options       a scp options string\n:rsync-options    a rsync options string.\n:user                    global user for cluster,if cluster do not have :user ,it will use this by default.\n:parallel               if to execute task on remote machines in parallel,default is false\n\nExample:\n      (set-options! :ssh-options \"-o ConnectTimeout=3000\")\n\n",
    :var-type "function",
-   :line 78,
+   :line 101,
    :file "src/control/core.clj"}
   {:arglists ([cmd & opts]),
    :name "ssh",
@@ -229,5 +239,5 @@
    :doc
    "Execute commands via ssh:\n(ssh \"date\")\n(ssh \"ps aux|grep java\")\n(ssh \"sudo apt-get update\" :sudo true)\n\nValid options:\n:sudo   whether to run commands as root,default is false\n:ssh-options  -- ssh options string",
    :var-type "function",
-   :line 95,
+   :line 126,
    :file "src/control/core.clj"})}

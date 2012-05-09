@@ -54,6 +54,8 @@ namespace.
     <div style="margin-left: 1em;" class="toc-entry">
       <a href="#control.core/call">call</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#control.core/clear-options!">clear-options!</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#control.core/defcluster">defcluster</a>
     </div><div style="margin-left: 1em;" class="toc-entry">
       <a href="#control.core/deftask">deftask</a>
@@ -99,9 +101,20 @@ namespace.
 </div><div id="var-entry">
   <br />
   <hr />
+  <h2 id="control.core/clear-options!">clear-options!</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (clear-options!)
+</pre>
+  <pre id="var-docstr">Clear global options</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
   <h2 id="control.core/defcluster">defcluster</h2>
   <span id="var-type">macro</span><br />
-  <pre id="var-usage">Usage: (defcluster name &amp; args)
+  <pre id="var-usage">Usage: (defcluster cname &amp; args)
 </pre>
   <pre id="var-docstr">Define a cluster including some remote machines,for example:
       (defcluster :mycluster
@@ -118,7 +131,7 @@ namespace.
   <hr />
   <h2 id="control.core/deftask">deftask</h2>
   <span id="var-type">macro</span><br />
-  <pre id="var-usage">Usage: (deftask name &amp; decl)
+  <pre id="var-usage">Usage: (deftask tname &amp; decl)
 </pre>
   <pre id="var-docstr">Define a task for executing on remote machines:
  (deftask :date "Get date from remote machines"
@@ -179,7 +192,7 @@ Valid options:
   <hr />
   <h2 id="control.core/set-options!">set-options!</h2>
   <span id="var-type">function</span><br />
-  <pre id="var-usage">Usage: (set-options! key value)
+  <pre id="var-usage">Usage: (set-options! key value &amp; kvs)
 </pre>
   <pre id="var-docstr">Set global options for ssh,scp and rsync,
  key and value  could be:
@@ -189,6 +202,7 @@ Valid options:
 :scp-options       a scp options string
 :rsync-options    a rsync options string.
 :user                    global user for cluster,if cluster do not have :user ,it will use this by default.
+:parallel               if to execute task on remote machines in parallel,default is false
 
 Example:
       (set-options! :ssh-options "-o ConnectTimeout=3000")
