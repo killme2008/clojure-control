@@ -197,6 +197,16 @@
    :var-type "function",
    :line 265,
    :file "src/control/core.clj"}
+  {:arglists ([cmd]),
+   :name "local",
+   :namespace "control.core",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/control.core-api.html#control.core/local",
+   :doc "Execute command on local machine",
+   :var-type "function",
+   :line 56,
+   :file "src/control/core.clj"}
   {:arglists ([src dst & opts]),
    :name "rsync",
    :namespace "control.core",
