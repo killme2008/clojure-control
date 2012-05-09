@@ -67,10 +67,10 @@ A task to deploy application:
 
     (deftask :deploy-app []
           (local "tar zcvf app.tar.gz app/")
-          (scp "app.tar.gz" "/home/app/")
+          (scp "app.tar.gz" "/home/user/")
           (ssh
                (run 
-                   (cd "/home/app"
+                   (cd "/home/user"
 				      (run "tar zxvf app.tar.gz")
        				  (env "JAVA_OPTS" "-XMaxPermSize=128m"
                              (run "bin/app.sh restart"))))))
