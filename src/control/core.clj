@@ -3,7 +3,7 @@
      :author " Dennis Zhuang <killme2008@gmail.com>"}
   (:use [clojure.java.io :only [reader]]
         [clojure.java.shell :only [sh]]
-        [clojure.string :only [join blank?]]
+        [clojure.string :only [join blank? split]]
         [clojure.walk :only [walk postwalk]]))
 
 (def ^:dynamic *enable-color* true)
@@ -317,6 +317,15 @@
 (defn- is-parallel? [cluster]
   (or (:parallel cluster) (:parallel @*global-options*)))
 
+(defn- create-clients [arg]
+  (when (> (.indexOf ^String arg "@") 0)
+    (let [a (split arg #"@")
+          user (first a)
+          host (second a)]
+      (when-exit (nil? user) "user is nil")
+      (when-exit (nil? host) "host is nil")
+      [{:user user :host host}])))
+
 (defn do-begin [args]
   (when-exit (< (count args) 2)
              "Please offer cluster and task name"
@@ -331,8 +340,10 @@
                    task (task-name @tasks)
                    includes (:includes cluster)
                    debug (:debug cluster)
-                   log (:log cluster)]
+                   log (:log cluster)
+                   clients (when (nil? cluster) (create-clients (first args)))]
                (check-valid-options cluster :user :clients :addresses :parallel :includes :debug :log :ssh-options :scp-options :rsync-options :name)
+               ;;if task is nil,exit 
                (when-exit (nil? task)
                           (str "No task named " (name task-name)))
                (when-exit (and (empty? addresses)
@@ -340,6 +351,7 @@
                                (empty? clients))
                           (str "Empty hosts for cluster "
                                (name cluster-name)))
+               ;;check task arguments count
                (let [task-arg-count (- (arg-count task) 3)]
                  (when-exit (> task-arg-count (count task-args))
                             (str "Task "
