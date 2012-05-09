@@ -53,8 +53,9 @@
   (when (and *enable-logging* (not (blank? (join " " content))))
     (println (gen-log host tag content))))
 
-(defn local [ cmd ]
+(defn local
   "Execute command on local machine"
+  [cmd]
   (when *enable-logging* (println (cli-bash-bold "Performing " cmd " on local")))
   (let [rt (apply sh ["sh" "-c" cmd])
         status (:exit rt)
