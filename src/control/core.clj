@@ -79,10 +79,9 @@
     execp))
 
 (defn ssh-client [host user]
-  (let [user (or user (:user @*global-options*))]
-    (when-not user
-      (throw (IllegalArgumentException. "user is nil")))
-    (str user "@" host)) )
+  (if-let [user (or user (:user @*global-options*))]
+    (str user "@" host)
+    (throw (IllegalArgumentException. "user is nil"))))
 
 (defn-  user-at-host? [host user]
   (fn [m]
