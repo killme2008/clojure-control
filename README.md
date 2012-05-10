@@ -79,6 +79,29 @@ A task to deploy application:
 	    			      (run "tar zxvf app.tar.gz")
        	    			  (env "JAVA_OPTS" "-XMaxPermSize=128m"
                              (run "bin/app.sh restart")))))))
+
+Two tasks to install zookeeper c client:
+
+     (deftask ldconfig
+	   []
+	     (ssh "ldconfig" :sudo true))
+
+	(deftask install_zk_client
+	  []
+	      (ssh
+		   (run
+		       (run "mkdir -p /home/deploy/dennis")
+			   (cd "/home/deploy/dennis"
+			           (run "wget http://labs.renren.com/apache-mirror//zookeeper/zookeeper-3.4.3/zookeeper-3.4.3.tar.gz"))))
+	     (ssh (cd "/home/deploy/dennis"
+	            (run "tar zxvf zookeeper-3.4.3.tar.gz")))
+         (ssh (cd "/home/deploy/dennis/zookeeper-3.4.3/src/c"
+		        (run
+		              (run "./configure --includedir=/usr/include")
+		              (run "make")
+		             (run "sudo make install"))))
+		  (call :ldconfig))
+
                        
 ##Documents
 
