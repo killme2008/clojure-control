@@ -9,7 +9,7 @@ The idea came from [node-control](https://github.com/tsmith/node-control).
 ## Gettting started
 I recommend you to use clojure-control with lein control plugin,you can install the plugin by:
 
-    lein plugin install control 0.3.4           #For clojure 1.3+
+    lein plugin install control 0.3.5           #For clojure 1.3+
     lein plugin install control 0.3.1           #For clojure 1.2, some features are not valid in this version.Recommend using 0.3.3
 
 And then use lein to create a control project,for example
@@ -42,6 +42,10 @@ Output:
     localhost:stdout: Sun Jul 24 19:14:09 CST 2011
     localhost:exit: 0
 
+Also,you can run the task with `user@host` (since 0.3.5):
+		 
+		 lein control run root@localhost date
+
 You may have to type password when running this task. You can setup ssh public keys to avoid typing a password when logining remote machines.please visit [HOWTO: set up ssh keys](http://pkeck.myweb.uga.edu/ssh/)
 
 Every task's running result is a map contains output and status,you can get them by:
@@ -71,9 +75,10 @@ A task to deploy application:
           (ssh
                (run 
                    (cd "/home/user"
-				      (run "tar zxvf app.tar.gz")
-       				  (env "JAVA_OPTS" "-XMaxPermSize=128m"
-                             (run "bin/app.sh restart"))))))
+    				   (run
+	    			      (run "tar zxvf app.tar.gz")
+       	    			  (env "JAVA_OPTS" "-XMaxPermSize=128m"
+                             (run "bin/app.sh restart")))))))
                        
 ##Documents
 
