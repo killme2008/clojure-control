@@ -42,7 +42,7 @@ Output:
     localhost:stdout: Sun Jul 24 19:14:09 CST 2011
     localhost:exit: 0
 
-Also,you can run the task with `user@host` (since 0.3.5):
+Also,you can run the task with `user@host` instead of a pre-defined cluster (since 0.3.5):
 		 
 		 lein control run root@localhost date
 
@@ -82,8 +82,15 @@ A task to deploy application:
                        
 ##Documents
 
-* [Wiki](https://github.com/killme2008/clojure-control/wiki)
+* [Getting started](wiki/Getting-started)
+* [Define clusters](wiki/Define-clusters)
+* [Define tasks](wiki/Define-tasks)
+* [DSL commands](wiki/commands)
+* [Leiningen plugin commands](wiki/Leiningen-plugin-commands)
 * [API document](http://fnil.net/clojure-control/)
+
+
+* [Wiki](https://github.com/killme2008/clojure-control/wiki)
 
 ## Contributors
 
