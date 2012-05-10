@@ -86,7 +86,7 @@ Two tasks to install zookeeper c client:
 	   []
 	     (ssh "ldconfig" :sudo true))
 
-	(deftask install_zk_client
+	 (deftask install_zk_client
 	  []
 	      (ssh
 		   (run
@@ -99,10 +99,9 @@ Two tasks to install zookeeper c client:
 		        (run
 		              (run "./configure --includedir=/usr/include")
 		              (run "make")
-		             (run "sudo make install"))))
+		              (run "sudo make install"))))
 		  (call :ldconfig))
 
-                       
 ##Documents
 
 * [Getting started](wiki/Getting-started)
