@@ -341,7 +341,7 @@
                    includes (:includes cluster)
                    debug (:debug cluster)
                    log (:log cluster)
-                   clients (when (nil? cluster) (create-clients (first args)))]
+                   clients (if (nil? cluster) (create-clients (first args)) clients)]
                (check-valid-options cluster :user :clients :addresses :parallel :includes :debug :log :ssh-options :scp-options :rsync-options :name)
                ;;if task is nil,exit 
                (when-exit (nil? task)
