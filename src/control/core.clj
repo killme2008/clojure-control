@@ -359,7 +359,7 @@
                                  " just needs "
                                  task-arg-count
                                  " arguments")))
-               (binding [*enable-logging* (or log true)
+               (binding [*enable-logging* (or log false)
                          *debug* debug]
                  (when *enable-logging*
                    (println  (str bash-bold
