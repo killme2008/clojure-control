@@ -122,7 +122,9 @@ Two tasks to install zookeeper c client:
 
 [ljos](https://github.com/ljos)
 
+##License
 
+MIT licensed
 
 
 
