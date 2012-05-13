@@ -237,7 +237,7 @@
         new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
-                                 (if (cmd system-functions)
+                                 (if (and (symbol? cmd) (get system-functions cmd))
                                    (list* cmd  '&host '&user 'cluster (rest item))
                                    item))
                                item))
