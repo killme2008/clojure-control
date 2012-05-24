@@ -104,11 +104,11 @@ Two tasks to install zookeeper c client:
 
 ##Documents
 
-* [Getting started](wiki/Getting-started)
-* [Define clusters](wiki/Define-clusters)
-* [Define tasks](wiki/Define-tasks)
-* [DSL commands](wiki/commands)
-* [Leiningen plugin commands](wiki/Leiningen-plugin-commands)
+* [Getting started](https://github.com/killme2008/clojure-control/wiki/Getting-started)
+* [Define clusters](https://github.com/killme2008/clojure-control/wiki/Define-clusters)
+* [Define tasks](https://github.com/killme2008/clojure-control/wiki/Define-tasks)
+* [DSL commands](https://github.com/killme2008/clojure-control/wiki/commands)
+* [Leiningen plugin commands](https://github.com/killme2008/clojure-control/wiki/Leiningen-plugin-commands)
 * [API document](http://fnil.net/clojure-control/)
 
 
