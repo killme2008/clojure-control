@@ -4,8 +4,7 @@
   (:use [clojure.java.io :only [reader]]
         [clojure.java.shell :only [sh]]
         [clojure.string :only [join blank? split]]
-        [clojure.walk :only [walk postwalk]])
-  (:gen-class))
+        [clojure.walk :only [walk postwalk]]))
 
 (def ^:dynamic *enable-color* true)
 ;;Error mode,:exit or :exception.
@@ -19,7 +18,7 @@
 ;;Global options for ssh,scp and rsync
 (def ^{:dynamic true :private true} *global-options* (atom {}))
 
-(defn- error [msg]
+(defn error [msg]
   (if (= :exit (or (:error-mode @*global-options*) *error-mode*))
     (do (doto System/err (.println msg)) (System/exit 1))
     (throw (RuntimeException. msg))))
@@ -389,5 +388,3 @@
 (defn begin []
   (do-begin *command-line-args*))
 
-(defn -main [ & args]
-  (do-begin args))
