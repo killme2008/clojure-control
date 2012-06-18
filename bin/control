@@ -1,0 +1,180 @@
+#!/bin/bash
+#Clojure-control script.
+#Modified from leiningen:https://raw.github.com/technomancy/leiningen/preview/bin/lein
+#License: Eclipse Public License,same as leiningen and clojure.
+
+export CONTROL_VERSION="0.4.0-SNAPSHOT"
+
+case $CONTROL_VERSION in
+    *SNAPSHOT) SNAPSHOT="YES" ;;
+    *) SNAPSHOT="NO" ;;
+esac
+
+if [ `id -u` -eq 0 ] && [ "$CONTROL_ROOT" = "" ]; then
+    echo "WARNING: You're currently running as root; probably by accident."
+    echo "Press control-C to abort or Enter to continue as root."
+    echo "Set CONTROL_ROOT to disable this warning."
+    read _
+fi
+
+NOT_FOUND=1
+ORIGINAL_PWD="$PWD"
+while [ ! -r "$PWD/control.clj" ] && [ "$PWD" != "/" ] && [ $NOT_FOUND -ne 0 ]
+do
+    cd ..
+    if [ "$(dirname "$PWD")" = "/" ]; then
+        NOT_FOUND=0
+        cd "$ORIGINAL_PWD"
+    fi
+done
+
+export CONTROL_HOME=${CONTROL_HOME:-"$HOME/.clojure-control"}
+
+if [ "$OSTYPE" = "cygwin" ]; then
+    export CONTROL_HOME=`cygpath -w $CONTROL_HOME`
+fi
+
+CONTROL_JAR="$CONTROL_HOME/self-installs/control-$CONTROL_VERSION-standalone.jar"
+
+# normalize $0 on certain BSDs
+if [ "$(dirname "$0")" = "." ]; then
+    SCRIPT="$(which $(basename "$0"))"
+else
+    SCRIPT="$0"
+fi
+
+# resolve symlinks to the script itself portably
+while [ -h "$SCRIPT" ] ; do
+    ls=`ls -ld "$SCRIPT"`
+    link=`expr "$ls" : '.*-> \(.*\)$'`
+    if expr "$link" : '/.*' > /dev/null; then
+        SCRIPT="$link"
+    else
+        SCRIPT="$(dirname "$SCRIPT"$)/$link"
+    fi
+done
+
+BIN_DIR="$(dirname "$SCRIPT")"
+
+if [ -r "$BIN_DIR/../src/control/version.clj" ]; then
+    # Running from source checkout
+    CONTROL_DIR="$(dirname "$BIN_DIR")"
+    CONTROL_LIBS="$(find -H "$CONTROL_DIR/lib" -mindepth 1 -maxdepth 1 -print0 2> /dev/null | tr \\0 \:)"
+    CLASSPATH="$CLASSPATH:$CONTROL_LIBS:$CONTROL_DIR/src:$CONTROL_DIR/classes:$CONTROL_DIR/resources:$CONTROL_JAR"
+
+    if [ "$CONTROL_LIBS" = "" -a "$1" != "self-install" -a ! -r "$CONTROL_JAR" ]; then
+        echo "Leiningen is missing its dependencies. Please see \"Building\" in the README."
+        exit 1
+    fi
+else
+    # Not running from a checkout
+    CLASSPATH="$CLASSPATH:$CONTROL_JAR"
+
+    if [ ! -r "$CONTROL_JAR" -a "$1" != "self-install" ]; then
+        "$0" self-install
+    fi
+fi
+
+HTTP_CLIENT=${HTTP_CLIENT:-"wget -O"}
+if type -p curl >/dev/null 2>&1; then
+    if [ "$https_proxy" != "" ]; then
+        CURL_PROXY="-x $https_proxy"
+    fi
+    HTTP_CLIENT="curl $CURL_PROXY -f -L -o"
+fi
+
+export JAVA_CMD=${JAVA_CMD:-"java"}
+export CONTROL_JAVA_CMD=${CONTROL_JAVA_CMD:-$JAVA_CMD}
+
+# Support $JAVA_OPTS for backwards-compatibility.
+export JVM_OPTS="${JVM_OPTS:-"$JAVA_OPTS"}"
+
+# TODO: investigate http://skife.org/java/unix/2011/06/20/really_executable_jars.html
+# If you're packaging this for a package manager (.deb, homebrew, etc)
+# you need to remove the self-install and upgrade functionality or see lein-pkg.
+if [ "$1" = "self-install" ]; then
+    if [ -r "$CONTROL_JAR" ]; then
+      echo "The self-install jar already exists at $CONTROL_JAR."
+      echo "If you wish to re-download, delete it and rerun \"$0 self-install\"."
+      exit 1
+    fi
+    echo "Downloading Clojure-Control now..."
+    CONTROL_DIR=`dirname "$CONTROL_JAR"`
+    mkdir -p "$CONTROL_DIR"
+    CONTROL_URL="https://github.com/downloads/killme2008/clojure-control/control-$CONTROL_VERSION-standalone.jar"
+    $HTTP_CLIENT "$CONTROL_JAR" "$CONTROL_URL"
+    if [ $? != 0 ]; then
+        echo "Failed to download $CONTROL_URL"
+        echo "If you have an old version of libssl you may not have the correct"
+        echo "certificate authority. Either upgrade or set HTTP_CLIENT to insecure:"
+        echo "  export HTTP_CLIENT=\"wget --no-check-certificate -O\" # or"
+        echo "  export HTTP_CLIENT=\"curl --insecure -f -L -o"
+        if [ $SNAPSHOT = "YES" ]; then
+            echo "If you have Maven installed, you can do"
+            echo "mvn dependency:copy-dependencies; mv target/dependency lib"
+            echo "See README.md for further SNAPSHOT build instructions."
+        fi
+        rm $CONTROL_JAR 2> /dev/null
+        exit 1
+    fi
+elif [ "$1" = "upgrade" ]; then
+    if [ "$CONTROL_DIR" != "" ]; then
+        echo "The upgrade task is not meant to be run from a checkout."
+        exit 1
+    fi
+    if [ $SNAPSHOT = "YES" ]; then
+        echo "The upgrade task is only meant for stable releases."
+        echo "See the \"Hacking\" section of the README."
+        exit 1
+    fi
+    if [ ! -w "$SCRIPT" ]; then
+        echo "You do not have permission to upgrade the installation in $SCRIPT"
+        exit 1
+    else
+        TARGET_VERSION="${2:-"stable"}"
+        echo "The script at $SCRIPT will be upgraded to the latest $TARGET_VERSION version."
+        echo -n "Do you want to continue [Y/n]? "
+        read RESP
+        case "$RESP" in
+            y|Y|"")
+                echo
+                echo "Upgrading..."
+                TARGET="/tmp/control-$$-upgrade"
+                if ["$OSTYPE" = "cygwin" ]; then
+                    TARGET=`cygpath -w $TARGET`
+                fi
+                CONTROL_SCRIPT_URL="https://github.com/technomancy/clojure-control/raw/$TARGET_VERSION/bin/lein"
+                $HTTP_CLIENT "$TARGET" "$CONTROL_SCRIPT_URL" \
+                    && mv "$TARGET" "$SCRIPT" \
+                    && chmod +x "$SCRIPT" \
+                    && echo && "$SCRIPT" self-install && echo && echo "Now running" `$SCRIPT version`
+                exit $?;;
+            *)
+                echo "Aborted."
+                exit 1;;
+        esac
+    fi
+else
+    if [ "$OSTYPE" = "cygwin" ]; then
+        # When running on Cygwin, use Windows-style paths for java
+        ORIGINAL_PWD=`cygpath -w "$ORIGINAL_PWD"`
+        CLASSPATH=`cygpath -wp "$CLASSPATH"`
+    fi
+
+    if [ $DEBUG ]; then
+        echo "Classpath: $CLASSPATH"
+    fi
+
+    $CONTROL_JAVA_CMD \
+        -client -XX:+TieredCompilation \
+        $CONTROL_JVM_OPTS \
+        -Dfile.encoding=UTF-8 \
+        -Dmaven.wagon.http.ssl.easy=false \
+        -Dclojure-control.original.pwd="$ORIGINAL_PWD" \
+        -cp "$CLASSPATH" \
+        clojure.main -m control.main "$@"
+
+    EXIT_CODE=$?
+
+    exit $EXIT_CODE
+fi

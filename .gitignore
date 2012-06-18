@@ -6,3 +6,7 @@ pom.xml
 .lein-failures
 *.swp
 autodoc/**
+.DS_Store
+build/
+doc/
+docs/
