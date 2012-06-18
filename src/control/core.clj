@@ -4,9 +4,12 @@
   (:use [clojure.java.io :only [reader]]
         [clojure.java.shell :only [sh]]
         [clojure.string :only [join blank? split]]
-        [clojure.walk :only [walk postwalk]]))
+        [clojure.walk :only [walk postwalk]])
+  (:gen-class))
 
 (def ^:dynamic *enable-color* true)
+;;Error mode,:exit or :exception.
+(def ^:dynamic *error-mode* :exit)
 (def ^{:dynamic true} *enable-logging* true)
 (def ^:dynamic *debug* false)
 (def ^:private bash-reset "\033[0m")
@@ -16,16 +19,19 @@
 ;;Global options for ssh,scp and rsync
 (def ^{:dynamic true :private true} *global-options* (atom {}))
 
+(defn- error [msg]
+  (if (= :exit (or (:error-mode @*global-options*) *error-mode*))
+    (do (doto System/err (.println msg)) (System/exit 1))
+    (throw (RuntimeException. msg))))
+
 (defn ^:private check-valid-options
   "Throws an exception if the given option map contains keys not listed
   as valid, else returns nil."
   [options & valid-keys]
   (when (seq (apply disj (apply hash-set (keys options)) valid-keys))
-    (throw
-     (IllegalArgumentException.
-      (apply str "Only these options are valid: "
+    (error (apply str "Only these options are valid: "
              (first valid-keys)
-             (map #(str ", " %) (rest valid-keys)))))))
+             (map #(str ", " %) (rest valid-keys))))))
 
 (defmacro ^:private cli-bash-bold [& content]
   `(if *enable-color*
@@ -81,7 +87,7 @@
 (defn ssh-client [host user]
   (if-let [user (or user (:user @*global-options*))]
     (str user "@" host)
-    (throw (IllegalArgumentException. "user is nil"))))
+    (error "user is nil")))
 
 (defn-  user-at-host? [host user]
   (fn [m]
@@ -108,6 +114,7 @@
   :rsync-options    a rsync options string.
   :user                    global user for cluster,if cluster do not have :user ,it will use this by default.
   :parallel               if to execute task on remote machines in parallel,default is false
+  :error-mode      mode-keyword,:exit (exit when error happends,the default error mode). or :exception (throw an exception).
 
   Example:
         (set-options! :ssh-options \"-o ConnectTimeout=3000\")
@@ -115,7 +122,7 @@
   "
   [key value & kvs]
   (let [options (apply hash-map key value kvs)]
-    (check-valid-options options :user :ssh-options :scp-options :rsync-options :parallel)
+    (check-valid-options options :user :ssh-options :scp-options :rsync-options :parallel :error-mode)
     (swap! *global-options* merge options)))
 
 (defn clear-options!
@@ -243,7 +250,7 @@
                                item))
                            body)]
     (when-not (vector? arguments)
-      (throw (IllegalArgumentException. (format "Task %s's arguments must be a vector" (name tname)))))
+      (error (format "Task %s's arguments must be a vector" (name tname))))
     (when *debug*
       (prn tname "new-body:" new-body))
     `(swap! tasks
@@ -300,7 +307,7 @@
      `(when-exit ~test ~error nil))
   ([test error else]
      `(if ~test
-        (do (println ~error) (throw (RuntimeException. ~error)))
+        (do (error ~error))
         ~else)))
 
 (defn- perform [host user cluster task taskName arguments]
@@ -381,3 +388,6 @@
 
 (defn begin []
   (do-begin *command-line-args*))
+
+(defn -main [ & args]
+  (do-begin args))
