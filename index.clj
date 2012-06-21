@@ -151,7 +151,7 @@
    :doc
    "Call other tasks in deftask,for example:\n(call :ps \"java\")",
    :var-type "function",
-   :line 256,
+   :line 262,
    :file "src/control/core.clj"}
   {:arglists ([]),
    :name "clear-options!",
@@ -161,7 +161,7 @@
    :wiki-url "/control.core-api.html#control.core/clear-options!",
    :doc "Clear global options",
    :var-type "function",
-   :line 121,
+   :line 127,
    :file "src/control/core.clj"}
   {:arglists ([cname & args]),
    :name "defcluster",
@@ -173,7 +173,7 @@
    :doc
    "Define a cluster including some remote machines,for example:\n      (defcluster :mycluster\n                :user \"login\"\n                :addresses [\"a.domain.com\" \"b.domain.com\"])\n\n Please see https://github.com/killme2008/clojure-control/wiki/Define-clusters\n",
    :var-type "macro",
-   :line 283,
+   :line 289,
    :file "src/control/core.clj"}
   {:arglists ([tname & decl]),
    :name "deftask",
@@ -185,7 +185,7 @@
    :doc
    "Define a task for executing on remote machines:\n (deftask :date \"Get date from remote machines\"\n           (ssh \"date\"))\n\nPlease see https://github.com/killme2008/clojure-control/wiki/Define-tasks",
    :var-type "macro",
-   :line 221,
+   :line 227,
    :file "src/control/core.clj"}
   {:arglists ([file]),
    :name "exists?",
@@ -195,7 +195,7 @@
    :wiki-url "/control.core-api.html#control.core/exists?",
    :doc "Check if a file or directory is exists",
    :var-type "function",
-   :line 265,
+   :line 271,
    :file "src/control/core.clj"}
   {:arglists ([cmd]),
    :name "local",
@@ -205,7 +205,7 @@
    :wiki-url "/control.core-api.html#control.core/local",
    :doc "Execute command on local machine",
    :var-type "function",
-   :line 56,
+   :line 61,
    :file "src/control/core.clj"}
   {:arglists ([src dst & opts]),
    :name "rsync",
@@ -216,7 +216,7 @@
    :doc
    "Rsync local files to remote machine's files,for example:\n   (deftask :deploy \"scp files to remote machines\" []\n  (rsync \"src/\" \":/home/login\"))\n\n  Valid options:\n  :rsync-options  -- rsync options string\n",
    :var-type "function",
-   :line 152,
+   :line 158,
    :file "src/control/core.clj"}
   {:arglists ([local remote & opts]),
    :name "scp",
@@ -227,7 +227,7 @@
    :doc
    "Copy local files to remote machines:\n (scp \"test.txt\" \"remote.txt\")\n (scp [\"1.txt\" \"2.txt\"] \"/home/deploy/\" :sudo true :mode 755)\n\nValid options:\n  :sudo  -- whether to copy files to remote machines as root\n  :mode -- files permission on remote machines\n  :scp-options -- scp options string",
    :var-type "function",
-   :line 174,
+   :line 180,
    :file "src/control/core.clj"}
   {:arglists ([key value & kvs]),
    :name "set-options!",
@@ -236,9 +236,9 @@
    :raw-source-url nil,
    :wiki-url "/control.core-api.html#control.core/set-options!",
    :doc
-   "Set global options for ssh,scp and rsync,\n key and value  could be:\n\n    Key                               Value\n:ssh-options        a ssh options string,for example \"-o ConnectTimeout=3000\"\n:scp-options       a scp options string\n:rsync-options    a rsync options string.\n:user                    global user for cluster,if cluster do not have :user ,it will use this by default.\n:parallel               if to execute task on remote machines in parallel,default is false\n\nExample:\n      (set-options! :ssh-options \"-o ConnectTimeout=3000\")\n\n",
+   "Set global options for ssh,scp and rsync,\n key and value  could be:\n\n    Key                               Value\n:ssh-options        a ssh options string,for example \"-o ConnectTimeout=3000\"\n:scp-options       a scp options string\n:rsync-options    a rsync options string.\n:user                    global user for cluster,if cluster do not have :user ,it will use this by default.\n:parallel               if to execute task on remote machines in parallel,default is false\n:error-mode      mode-keyword,:exit (exit when error happends,the default error mode). or :exception (throw an exception).\n\nExample:\n      (set-options! :ssh-options \"-o ConnectTimeout=3000\")\n\n",
    :var-type "function",
-   :line 101,
+   :line 106,
    :file "src/control/core.clj"}
   {:arglists ([cmd & opts]),
    :name "ssh",
@@ -249,5 +249,58 @@
    :doc
    "Execute commands via ssh:\n(ssh \"date\")\n(ssh \"ps aux|grep java\")\n(ssh \"sudo apt-get update\" :sudo true)\n\nValid options:\n:sudo   whether to run commands as root,default is false\n:ssh-options  -- ssh options string",
    :var-type "function",
-   :line 126,
-   :file "src/control/core.clj"})}
+   :line 132,
+   :file "src/control/core.clj"}
+  {:arglists ([& args]),
+   :name "init",
+   :namespace "control.main",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/control.main-api.html#control.main/init",
+   :doc
+   "Initialize clojure-control, create a sample control file in current directory",
+   :var-type "function",
+   :line 32,
+   :file "src/control/main.clj"}
+  {:arglists ([& args]),
+   :name "run",
+   :namespace "control.main",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/control.main-api.html#control.main/run",
+   :doc
+   "Run user-defined clojure-control tasks against certain cluster,\n-r [--[no-]remote],running commands on remote control server,default is false.\n-p [--port] port, control server port,\n-h [--host] host, control server host.",
+   :var-type "function",
+   :line 111,
+   :file "src/control/main.clj"}
+  {:arglists ([& args]),
+   :name "server",
+   :namespace "control.main",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/control.main-api.html#control.main/server",
+   :doc
+   "Start a control server for handling requests:\n-p [--port]  port , listen on which port",
+   :var-type "function",
+   :line 88,
+   :file "src/control/main.clj"}
+  {:arglists ([& args]),
+   :name "show",
+   :namespace "control.main",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/control.main-api.html#control.main/show",
+   :doc "Show cluster info",
+   :var-type "function",
+   :line 50,
+   :file "src/control/main.clj"}
+  {:arglists ([]),
+   :name "version",
+   :namespace "control.main",
+   :source-url nil,
+   :raw-source-url nil,
+   :wiki-url "/control.main-api.html#control.main/version",
+   :doc "Print version for Clojure-control and the current JVM.",
+   :var-type "function",
+   :line 25,
+   :file "src/control/main.clj"})}

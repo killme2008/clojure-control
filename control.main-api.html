@@ -51,7 +51,17 @@ namespace.
   <h1 class="nopad">Table of Contents</h1>
   <div style="margin-left: 1em;" class="toc-section">
     <a href="#toc0">Overview</a>
-    
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#control.main/init">init</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#control.main/run">run</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#control.main/server">server</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#control.main/show">show</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#control.main/version">version</a>
+    </div>
     <br />
   </div>
 </div>
@@ -68,7 +78,66 @@ namespace.
 
 <br />
 <h2>Public Variables and Functions</h2>
-
+<div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="control.main/init">init</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (init &amp; args)
+</pre>
+  <pre id="var-docstr">Initialize clojure-control, create a sample control file in current directory</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="control.main/run">run</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (run &amp; args)
+</pre>
+  <pre id="var-docstr">Run user-defined clojure-control tasks against certain cluster,
+-r [--[no-]remote],running commands on remote control server,default is false.
+-p [--port] port, control server port,
+-h [--host] host, control server host.</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="control.main/server">server</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (server &amp; args)
+</pre>
+  <pre id="var-docstr">Start a control server for handling requests:
+-p [--port]  port , listen on which port</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="control.main/show">show</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (show &amp; args)
+</pre>
+  <pre id="var-docstr">Show cluster info</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="control.main/version">version</h2>
+  <span id="var-type">function</span><br />
+  <pre id="var-usage">Usage: (version)
+</pre>
+  <pre id="var-docstr">Print version for Clojure-control and the current JVM.</pre>
+  
+  
+  
+</div>
 
 
 </div>

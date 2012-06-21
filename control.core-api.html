@@ -216,6 +216,7 @@ Valid options:
 :rsync-options    a rsync options string.
 :user                    global user for cluster,if cluster do not have :user ,it will use this by default.
 :parallel               if to execute task on remote machines in parallel,default is false
+:error-mode      mode-keyword,:exit (exit when error happends,the default error mode). or :exception (throw an exception).
 
 Example:
       (set-options! :ssh-options "-o ConnectTimeout=3000")
