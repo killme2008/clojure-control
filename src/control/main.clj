@@ -33,7 +33,8 @@
   "Initialize clojure-control, create a sample control file in current directory"
   [ & args]
   (let [control-file (file "." "control.clj")]
-    (if-not (.exists control-file)
+    (if(.exists control-file)
+      (error "File control.clj exists")
       (spit control-file 
             (str 
              "(defcluster :default-cluster\n"
@@ -131,18 +132,20 @@
           (.close sock))))))
 
 
-(defn help-for [ name ]
-  name)
+(defn print-help []
+  (println "Clojure-Control,commands available:")
+  (println "init                           Initialize clojure-control, create a sample control file in current folder")
+  (println "run <cluster> <task> <args>    Run user-defined clojure-control tasks against certain cluster")
+  (println "show <cluster>                 Show cluster info")
+  (println "server                         Start a control server for handling requests from clients"))
 
-(defn -main [ cmd & args]
-  (case cmd
-    "init" (apply init args)
-    "run" (apply run args)
-    "show" (apply show args)
-    "server" (apply server args)
-    "version" (apply version args)
-    (println (help-for "control"))))
-
-
-
-
+(defn -main [ & args]
+  (let [cmd (first args)
+        args (next args)]
+    (case cmd
+      "init" (apply init args)
+      "run" (apply run args)
+      "show" (apply show args)
+      "server" (apply server args)
+      "version" (apply version args)
+      (print-help))))

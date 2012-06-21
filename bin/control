@@ -56,14 +56,14 @@ done
 
 BIN_DIR="$(dirname "$SCRIPT")"
 
-if [ -r "$BIN_DIR/../src/control/version.clj" ]; then
+if [ -r "$BIN_DIR/../src/control/main.clj" ]; then
     # Running from source checkout
     CONTROL_DIR="$(dirname "$BIN_DIR")"
     CONTROL_LIBS="$(find -H "$CONTROL_DIR/lib" -mindepth 1 -maxdepth 1 -print0 2> /dev/null | tr \\0 \:)"
     CLASSPATH="$CLASSPATH:$CONTROL_LIBS:$CONTROL_DIR/src:$CONTROL_DIR/classes:$CONTROL_DIR/resources:$CONTROL_JAR"
 
     if [ "$CONTROL_LIBS" = "" -a "$1" != "self-install" -a ! -r "$CONTROL_JAR" ]; then
-        echo "Leiningen is missing its dependencies. Please see \"Building\" in the README."
+        echo "Clojure control is missing its dependencies. Please see \"Building\" in the README."
         exit 1
     fi
 else
@@ -143,7 +143,7 @@ elif [ "$1" = "upgrade" ]; then
                 if ["$OSTYPE" = "cygwin" ]; then
                     TARGET=`cygpath -w $TARGET`
                 fi
-                CONTROL_SCRIPT_URL="https://github.com/technomancy/clojure-control/raw/$TARGET_VERSION/bin/lein"
+                CONTROL_SCRIPT_URL="https://github.com/killme2008/clojure-control/raw/$TARGET_VERSION/bin/control"
                 $HTTP_CLIENT "$TARGET" "$CONTROL_SCRIPT_URL" \
                     && mv "$TARGET" "$SCRIPT" \
                     && chmod +x "$SCRIPT" \
