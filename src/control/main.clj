@@ -67,7 +67,8 @@
 (defn- run-control [ & args]
   (do
     (load-control-file)
-    (do-begin args)))
+    (do-begin args)
+    (shutdown-agents)))
 
 (defn- handle-conn
   [^java.net.Socket socket]
