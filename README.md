@@ -6,22 +6,34 @@ Clojure-control depends only on OpenSSH and clojure on the local control machine
 
 The idea came from [node-control](https://github.com/tsmith/node-control).
 
-## Gettting started
-I recommend you to use clojure-control with lein control plugin,you can install the plugin by:
+## Installation
 
-    lein plugin install control 0.3.8           #For clojure 1.3+
-    lein plugin install control 0.3.1           #For clojure 1.2, some features are not valid in this version.Recommend using 0.3.3
+Clojure-Control bootstraps itself using the `control` shell script; there is no separate install script. It installs its dependencies upon the first run on unix, so the first run will take longer.
 
-And then use lein to create a control project,for example
+* [Download the script.](https://raw.github.com/killme2008/clojure-control/master/bin/control)
+* Place it on your $PATH. (I like to use ~/bin)
+* Set it to be executable. (`chmod 755 ~/bin/control`)
+The link above will get you the stable release. 
 
-    lein new mycontrol
+On Windows most users can get the batch file. If you have wget.exe or curl.exe already installed and in PATH, you can just run `control self-install`, otherwise get the standalone jar from the downloads page. If you have Cygwin you should be able to use the shell script above rather than the batch file.
+
+## Basic Usage
+
+The tutorial has a detailed walk-through of the steps involved in creating a control project, but here are the commonly-used tasks:
+
+     control init                     #create a sample control file in current folder
+	 control run CLUSTER TASK <args>  #run user-defined clojure-control tasks against certain cluster 
+     control show CLUSTER             #show certain cluster info.
+
+Use control help to see a complete list.
+
+## Getting started
 
 Creating a control file by:
+    
+	control init
 
-     cd mycontrol
-     lein control init
-
-It will create a file named `control.clj` under mycontrol folder.Defines your clusters and tasks in this file,for example:
+It will create a file named `control.clj` under current folder.Defines your clusters and tasks in this file,for example:
     
      (defcluster :default-cluster
          :clients [
@@ -32,7 +44,7 @@ It will create a file named `control.clj` under mycontrol folder.Defines your cl
 
 It defines a cluster named `default-cluster`,and defines a task named `date` to execute `date` command on remote machines.Run `date` task on `default-cluster` by:
 
-    lein control run default-cluster date
+    control run default-cluster date
 
 Output:
 
@@ -42,9 +54,9 @@ Output:
     localhost:stdout: Sun Jul 24 19:14:09 CST 2011
     localhost:exit: 0
 
-Also,you can run the task with `user@host` instead of a pre-defined cluster (since 0.3.5):
+Also,you can run the task with `user@host` instead of a pre-defined cluster:
 		 
-		 lein control run root@localhost date
+		 control run root@localhost date
 
 You may have to type password when running this task. You can setup ssh public keys to avoid typing a password when logining remote machines.please visit [HOWTO: set up ssh keys](http://pkeck.myweb.uga.edu/ssh/)
 
@@ -108,7 +120,7 @@ Two tasks to install zookeeper c client:
 * [Define clusters](https://github.com/killme2008/clojure-control/wiki/Define-clusters)
 * [Define tasks](https://github.com/killme2008/clojure-control/wiki/Define-tasks)
 * [DSL commands](https://github.com/killme2008/clojure-control/wiki/commands)
-* [Leiningen plugin commands](https://github.com/killme2008/clojure-control/wiki/Leiningen-plugin-commands)
+* [Clojure-Control shell commands](https://github.com/killme2008/clojure-control/wiki/Leiningen-plugin-commands)
 * [API document](http://fnil.net/clojure-control/)
 
 
