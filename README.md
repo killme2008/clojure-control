@@ -20,7 +20,7 @@ On Windows most users can get the batch file. If you have wget.exe or curl.exe a
 
 ## Basic Usage
 
-The tutorial has a detailed walk-through of the steps involved in creating a control project, but here are the commonly-used tasks:
+The [tutorial](https://github.com/killme2008/clojure-control/wiki) has a detailed walk-through of the steps involved in creating a control project, but here are the commonly-used tasks:
 
      control init                     #create a sample control file in current folder
 	 control run CLUSTER TASK <args>  #run user-defined clojure-control tasks against certain cluster 
