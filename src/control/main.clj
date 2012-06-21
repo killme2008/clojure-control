@@ -137,7 +137,10 @@
   (println "init                           Initialize clojure-control, create a sample control file in current folder")
   (println "run <cluster> <task> <args>    Run user-defined clojure-control tasks against certain cluster")
   (println "show <cluster>                 Show cluster info")
-  (println "server                         Start a control server for handling requests from clients"))
+  (println "server                         Start a control server for handling requests from clients")
+  (println "upgrade                        Upgrade clojure-control to a latest version."))
+
+
 
 (defn -main [ & args]
   (let [cmd (first args)

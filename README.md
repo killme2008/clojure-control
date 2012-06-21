@@ -20,7 +20,7 @@ On Windows most users can get the batch file. If you have wget.exe or curl.exe a
 
 ## Basic Usage
 
-The [tutorial](https://github.com/killme2008/clojure-control/wiki) has a detailed walk-through of the steps involved in creating a control project, but here are the commonly-used tasks:
+The [tutorial](https://github.com/killme2008/clojure-control/wiki/Getting-started) has a detailed walk-through of the steps involved in creating a control project, but here are the commonly-used tasks:
 
      control init                     #create a sample control file in current folder
 	 control run CLUSTER TASK <args>  #run user-defined clojure-control tasks against certain cluster 
@@ -121,7 +121,7 @@ Two tasks to install zookeeper c client:
 * [Define clusters](https://github.com/killme2008/clojure-control/wiki/Define-clusters)
 * [Define tasks](https://github.com/killme2008/clojure-control/wiki/Define-tasks)
 * [DSL commands](https://github.com/killme2008/clojure-control/wiki/commands)
-* [Clojure-Control shell commands](https://github.com/killme2008/clojure-control/wiki/Leiningen-plugin-commands)
+* [Clojure-Control shell commands](https://github.com/killme2008/clojure-control/wiki/Control-shell-commands)
 * [API document](http://fnil.net/clojure-control/)
 
 
