@@ -13,6 +13,7 @@ Clojure-Control bootstraps itself using the `control` shell script; there is no 
 * [Download the script.](https://raw.github.com/killme2008/clojure-control/master/bin/control)
 * Place it on your $PATH. (I like to use ~/bin)
 * Set it to be executable. (`chmod 755 ~/bin/control`)
+
 The link above will get you the stable release. 
 
 On Windows most users can get the batch file. If you have wget.exe or curl.exe already installed and in PATH, you can just run `control self-install`, otherwise get the standalone jar from the downloads page. If you have Cygwin you should be able to use the shell script above rather than the batch file.
@@ -25,7 +26,7 @@ The tutorial has a detailed walk-through of the steps involved in creating a con
 	 control run CLUSTER TASK <args>  #run user-defined clojure-control tasks against certain cluster 
      control show CLUSTER             #show certain cluster info.
 
-Use control help to see a complete list.
+Use `control help` to see a complete list.
 
 ## Getting started
 
