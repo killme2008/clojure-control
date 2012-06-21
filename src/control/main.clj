@@ -32,10 +32,10 @@
 (defn init
   "Initialize clojure-control, create a sample control file in current directory"
   [ & args]
-  (let [control-file (file "." "control.clj")]
-    (if(.exists control-file)
+  (let [control-file (file (get-control-dir) "control.clj")]
+    (if (.exists control-file)
       (error "File control.clj exists")
-      (spit control-file 
+      (do (spit control-file 
             (str 
              "(defcluster :default-cluster\n"
              "  :clients [\n"
@@ -44,7 +44,8 @@
              "\n"
              "(deftask :date \"echo date on cluster\""
              "  []\n"
-             "  (ssh \"date\"))\n")))))
+             "  (ssh \"date\"))\n"))
+          (println "Create file control.clj.")))))
 
 (defn show
   "Show cluster info"
