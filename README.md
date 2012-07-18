@@ -6,6 +6,10 @@ Clojure-control depends only on OpenSSH and clojure on the local control machine
 
 The idea came from [node-control](https://github.com/tsmith/node-control).
 
+##News
+
+ * Control 0.4.1 released.[ReleaseNotes](https://groups.google.com/forum/?fromgroups#!topic/clojure/MLR_5VfenSs)
+
 ## Installation
 
 Clojure-Control bootstraps itself using the `control` shell script; there is no separate install script. It installs its dependencies upon the first run on unix, so the first run will take longer.
