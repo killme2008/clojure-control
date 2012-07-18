@@ -5,6 +5,8 @@
         [clojure.java.io :only [file reader writer]])
   (:gen-class))
 
+(def ^:private special-control-file (atom nil))
+
 (def ^{:private true :tag String} CONTROL-DIR "clojure-control.original.pwd")
 
 (defn- get-control-dir []
@@ -19,7 +21,7 @@
       (refer-clojure)
       (use '[control core commands])
       (load-file
-       (str (get-control-dir) "/control.clj")))
+       (or @special-control-file (str (get-control-dir) "/control.clj"))))
     (catch java.io.FileNotFoundException e (error "control file not found."))))
 
 (defn version
@@ -135,7 +137,8 @@
 
 
 (defn print-help []
-  (println "Clojure-Control,commands available:")
+  (println "Usage:control [-f control.clj] command args")
+  (println "Commands available:")
   (println "init                           Initialize clojure-control, create a sample control file in current folder")
   (println "run <cluster> <task> <args>    Run user-defined clojure-control tasks against certain cluster")
   (println "show <cluster>                 Show cluster info")
@@ -145,8 +148,13 @@
 
 
 (defn -main [ & args]
-  (let [cmd (first args)
-        args (next args)]
+  (let [[options extra-args]
+        (cli args ["-f" "--file" "Which control file to be executed."])
+        {:keys [file]} options
+        cmd (first extra-args)
+        args (next extra-args)]
+    (when file
+      (reset! special-control-file file))
     (case cmd
       "init" (apply init args)
       "run" (apply run args)
