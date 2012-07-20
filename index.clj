@@ -260,7 +260,7 @@
    :doc
    "Initialize clojure-control, create a sample control file in current directory",
    :var-type "function",
-   :line 32,
+   :line 34,
    :file "src/control/main.clj"}
   {:arglists ([& args]),
    :name "run",
@@ -271,7 +271,7 @@
    :doc
    "Run user-defined clojure-control tasks against certain cluster,\n-r [--[no-]remote],running commands on remote control server,default is false.\n-p [--port] port, control server port,\n-h [--host] host, control server host.",
    :var-type "function",
-   :line 111,
+   :line 113,
    :file "src/control/main.clj"}
   {:arglists ([& args]),
    :name "server",
@@ -282,7 +282,7 @@
    :doc
    "Start a control server for handling requests:\n-p [--port]  port , listen on which port",
    :var-type "function",
-   :line 88,
+   :line 90,
    :file "src/control/main.clj"}
   {:arglists ([& args]),
    :name "show",
@@ -292,7 +292,7 @@
    :wiki-url "/control.main-api.html#control.main/show",
    :doc "Show cluster info",
    :var-type "function",
-   :line 50,
+   :line 52,
    :file "src/control/main.clj"}
   {:arglists ([]),
    :name "version",
@@ -302,5 +302,5 @@
    :wiki-url "/control.main-api.html#control.main/version",
    :doc "Print version for Clojure-control and the current JVM.",
    :var-type "function",
-   :line 25,
+   :line 27,
    :file "src/control/main.clj"})}
