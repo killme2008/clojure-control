@@ -83,11 +83,14 @@ You can do whatever you want with these values,for example,checking status is ri
 
 A task to ping mysql:
 
+```clj
+
 	(deftask :ping-mysql  []
 	  (let [stdout (:stdout (ssh "mysqladmin -u root  -p'password' ping"))]
 	      (if (.contains stdout "is alive")
       	  1
 		  0)))
+```
 
 A task to deploy application:
 
@@ -147,6 +150,8 @@ Two tasks to install zookeeper c client:
 [onycloud](https://github.com/onycloud/) 
 
 [ljos](https://github.com/ljos)
+
+[dhilipsiva](https://github.com/dhilipsiva)
 
 ##License
 
