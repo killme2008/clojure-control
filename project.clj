@@ -1,6 +1,6 @@
 (defproject control/control "0.4.2-SNAPSHOT" 
   :lein-release {:deploy-via :clojars}
-  :dependencies [[org.clojure/clojure "1.3.0"]
+  :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/tools.cli "0.2.1"]]
   :author "dennis zhuang(killme2008@gmail.com)"
   :profiles {:dev {:dependencies [[codox "0.5.0"]]}}

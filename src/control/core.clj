@@ -346,7 +346,7 @@
                    task (task-name @tasks)
                    includes (:includes cluster)
                    debug (:debug cluster)
-                   log (:log cluster)
+                   log (or (:log cluster) true) 
                    clients (if (nil? cluster) (create-clients (first args)) clients)]
                (check-valid-options cluster :user :clients :addresses :parallel :includes :debug :log :ssh-options :scp-options :rsync-options :name)
                ;;if task is nil,exit 
@@ -365,7 +365,7 @@
                                  " just needs "
                                  task-arg-count
                                  " arguments")))
-               (binding [*enable-logging* (or *enable-logging* log false)
+               (binding [*enable-logging* (and *enable-logging* log)
                          *debug* debug]
                  (when *enable-logging*
                    (println  (str bash-bold
