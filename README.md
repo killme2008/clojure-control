@@ -39,26 +39,28 @@ Creating a control file by:
 	control init
 
 It will create a file named `control.clj` under current folder.Defines your clusters and tasks in this file,for example:
-    
+
+```clj
      (defcluster :default-cluster
          :clients [
                   {:host "localhost" :user "root"}
          ])
      (deftask :date "echo date on cluster"  []
          (ssh "date"))
+```
 
 It defines a cluster named `default-cluster`,and defines a task named `date` to execute `date` command on remote machines.Run `date` task on `default-cluster` by:
 
     control run default-cluster date
 
 Output:
-
+```
     Performing default-cluster
     Performing date for localhost
     localhost:ssh:  date
     localhost:stdout: Sun Jul 24 19:14:09 CST 2011
     localhost:exit: 0
-
+```
 Also,you can run the task with `user@host` instead of a pre-defined cluster:
 		 
 		 control run root@localhost date
@@ -67,10 +69,13 @@ You may have to type password when running this task. You can setup ssh public k
 
 Every task's running result is a map contains output and status,you can get them by:
 
+```clj
      (let [rt (ssh "date")]
        (println (:status rt))
        (println (:stdout rt))
        (println (:stderr rt)))
+```
+
 
 You can do whatever you want with these values,for example,checking status is right or writing standard output to a file.
 
@@ -78,14 +83,18 @@ You can do whatever you want with these values,for example,checking status is ri
 
 A task to ping mysql:
 
+```clj
+
 	(deftask :ping-mysql  []
 	  (let [stdout (:stdout (ssh "mysqladmin -u root  -p'password' ping"))]
 	      (if (.contains stdout "is alive")
       	  1
 		  0)))
+```
 
 A task to deploy application:
 
+```clj
     (deftask :deploy-app []
           (local "tar zcvf app.tar.gz app/")
           (scp "app.tar.gz" "/home/user/")
@@ -96,9 +105,11 @@ A task to deploy application:
 	    			      (run "tar zxvf app.tar.gz")
        	    			  (env "JAVA_OPTS" "-XMaxPermSize=128m"
                              (run "bin/app.sh restart")))))))
+```
 
 Two tasks to install zookeeper c client:
 
+```clj
      (deftask ldconfig
 	   []
 	     (ssh "ldconfig" :sudo true))
@@ -118,6 +129,7 @@ Two tasks to install zookeeper c client:
 		              (run "make")
 		              (run "sudo make install"))))
 		  (call :ldconfig))
+```
 
 ##Documents
 
@@ -138,6 +150,8 @@ Two tasks to install zookeeper c client:
 [onycloud](https://github.com/onycloud/) 
 
 [ljos](https://github.com/ljos)
+
+[dhilipsiva](https://github.com/dhilipsiva)
 
 ##License
 
