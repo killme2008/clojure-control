@@ -101,7 +101,7 @@ if [ "$1" = "self-install" ]; then
     echo "Downloading Clojure-Control now..."
     CONTROL_DIR=`dirname "$CONTROL_JAR"`
     mkdir -p "$CONTROL_DIR"
-    CONTROL_URL="https://github.com/downloads/killme2008/clojure-control/control-$CONTROL_VERSION-standalone.jar"
+    CONTROL_URL="https://github.com/killme2008/clojure-control/raw/master/downloads/control-$CONTROL_VERSION-standalone.jar"
     $HTTP_CLIENT "$CONTROL_JAR" "$CONTROL_URL"
     if [ $? != 0 ]; then
         echo "Failed to download $CONTROL_URL"
