@@ -140,7 +140,7 @@ elif [ "$1" = "upgrade" ]; then
                 echo
                 echo "Upgrading..."
                 TARGET="/tmp/control-$$-upgrade"
-                if ["$OSTYPE" = "cygwin" ]; then
+                if [ "$OSTYPE" = "cygwin" ]; then
                     TARGET=`cygpath -w $TARGET`
                 fi
                 CONTROL_SCRIPT_URL="https://github.com/killme2008/clojure-control/raw/$TARGET_VERSION/bin/control"
@@ -166,7 +166,7 @@ else
     fi
 
     $CONTROL_JAVA_CMD \
-        -client -XX:+TieredCompilation \
+        -client -client -XX:+TieredCompilation -XX:TieredStopAtLevel=1 \
         $CONTROL_JVM_OPTS \
         -Dfile.encoding=UTF-8 \
         -Dmaven.wagon.http.ssl.easy=false \
