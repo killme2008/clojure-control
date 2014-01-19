@@ -155,7 +155,7 @@
                           ssh-options
                           [(ssh-client host user) cmd]))))
 
-(defn rsync 
+(defn rsync
   "Rsync local files to remote machine's files,for example:
      (deftask :deploy \"scp files to remote machines\" []
     (rsync \"src/\" \":/home/login\"))
@@ -348,8 +348,8 @@
                    debug (:debug cluster)
                    log (or (:log cluster) true)
                    clients (if (nil? cluster) (create-clients (first args)) clients)]
-               (check-valid-options cluster :user :clients :addresses :parallel :includes :debug :log :ssh-options :scp-options :rsync-options :name)
-               ;;if task is nil,exit 
+               (check-valid-options cluster :user :clients :addresses :parallel :includes :debug :log :ssh-options :scp-options :rsync-options :name :options)
+               ;;if task is nil,exit
                (when-exit (nil? task)
                           (str "No task named " (name task-name)))
                (when-exit (and (empty? addresses)
@@ -387,4 +387,3 @@
 
 (defn begin []
   (do-begin *command-line-args*))
-
