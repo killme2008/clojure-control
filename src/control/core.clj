@@ -19,7 +19,7 @@
 (def ^{:dynamic true :private true} *global-options* (atom {}))
 
 (defn error [msg]
-  (if (= :exit (or (:error-mode @*global-options*) *error-mode*))
+  (if (= :exit (get @*global-options* :error-mode *error-mode*))
     (do (doto System/err (.println msg)) (System/exit 1))
     (throw (RuntimeException. msg))))
 
@@ -29,8 +29,8 @@
   [options & valid-keys]
   (when (seq (apply disj (apply hash-set (keys options)) valid-keys))
     (error (apply str "Only these options are valid: "
-             (first valid-keys)
-             (map #(str ", " %) (rest valid-keys))))))
+                  (first valid-keys)
+                  (map #(str ", " %) (rest valid-keys))))))
 
 (defmacro ^:private cli-bash-bold [& content]
   `(if *enable-color*
@@ -148,8 +148,8 @@
               cmd)
         ssh-options (or (:ssh-options m) (find-client-options host user cluster :ssh-options))]
     (check-valid-options m :sudo :ssh-options :mode :scp-options)
-	(log-with-tag host "ssh" ssh-options cmd)
-	(exec host
+    (log-with-tag host "ssh" ssh-options cmd)
+    (exec host
           user
           (make-cmd-array "ssh"
                           ssh-options
@@ -202,7 +202,7 @@
               remote)]
     (check-valid-options m :scp-options :sudo :mode :ssh-options)
     (log-with-tag host "scp" scp-options
-      (join " " (concat files [ " ==> " tmp])))
+                  (join " " (concat files [ " ==> " tmp])))
     (when use-tmp
       (ssh host user cluster (str "mkdir -p " tmp)))
     (let [rt (exec host
@@ -233,13 +233,24 @@
 "
     :arglists '([name doc-string? [params*] body])
     :added "0.1"}
-  deftask [tname & decl ]
+  deftask [tname & fdecl ]
   (let [tname (keyword tname)
-        m (if (string? (first decl))
-            (next decl)
-            decl)
-        arguments (first m)
-        body (next m)
+        m (if (string? (first fdecl))
+            {:doc (first fdecl)}
+            {})
+        fdecl (if (string? (first fdecl))
+                (next fdecl)
+                fdecl)
+        m (if (map? (first fdecl))
+            (conj m (first fdecl))
+            m)
+        fdecl (if (map? (first fdecl))
+                (next fdecl)
+                fdecl)
+        arguments (first fdecl)
+        arguments (vec (concat '[&host &user cluster] arguments))
+        m (conj {:arglists (list 'quote (list arguments))} m)
+        body (next fdecl)
         new-body (postwalk (fn [item]
                              (if (list? item)
                                (let [cmd (first item)]
@@ -252,21 +263,39 @@
       (error (format "Task %s's arguments must be a vector" (name tname))))
     (when *debug*
       (prn tname "new-body:" new-body))
-    `(swap! tasks
-            assoc
-            ~tname
-            ~(list 'fn
-                   (vec (concat '[&host &user cluster] arguments))
-                   (cons 'do new-body)))))
+    `(do
+       (swap! tasks
+              assoc
+              ~tname
+              ~(list
+                'with-meta
+                (list
+                 'fn
+                 arguments
+                 (cons 'do new-body))
+                m))
+       (get @tasks ~tname))))
+
+;;commands that already run.
+(defonce run-tasks (atom #{}))
+
+(defn- run? [name]
+  (@run-tasks name))
+
+(defn- run-task [f n args]
+  (swap! run-tasks conj n)
+  (apply f args))
+
+(declare perform)
 
 (defn call
   "Call other tasks in deftask,for example:
      (call :ps \"java\")"
   {:arglists '([task & args])}
-  [host user cluster task & args]
-  (apply
-   (task @tasks)
-   host user cluster args))
+  [host user cluster name & args]
+  (if-let [t (get @tasks name)]
+    (perform host user cluster t name args)
+    (error (format "Task %s not found." name))))
 
 (defn exists?
   "Check if a file or directory is exists"
@@ -310,8 +339,11 @@
         ~else)))
 
 (defn- perform [host user cluster task taskName arguments]
-  (do (when *enable-logging* (println (cli-bash-bold "Performing " (name taskName) " for " (ssh-client host user))))
-      (apply task host user cluster arguments)))
+  (when *enable-logging*
+    (println (cli-bash-bold "Performing " (name taskName) " for " (ssh-client host user))))
+  (if (and (-> task meta :once) (run? taskName))
+    (println (cli-bash-bold "Ignored once task " (name taskName)))
+    (run-task task taskName (concat [host user cluster] arguments))))
 
 (defn- arg-count [f]
   (let [m (first (filter #(= (.getName %) "invoke") (.getDeclaredMethods (class f))))

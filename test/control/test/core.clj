@@ -8,12 +8,17 @@
   (try
 	(f)
 	(finally
-	 (reset! tasks (hash-map))
-	 (reset! clusters (hash-map)))))
+      (reset! tasks (hash-map))
+      (reset! run-tasks #{})
+      (reset! clusters (hash-map)))))
 
 (use-fixtures :each control-fixture)
 
-(defn- arg-count [f] (let [m (first (.getDeclaredMethods (class f))) p (.getParameterTypes m)] (alength p)))
+(defn- arg-count [f] (-> f
+                         meta
+                         :arglists
+                         first
+                         count))
 (deftest test-gen-log
   (binding [*enable-color* false]
     (is (= "localhost:ssh: test" (gen-log "localhost" "ssh" '("test"))))
@@ -67,16 +72,16 @@
   (deftest test-create-clients
     (is (= [{:user "deploy" :host "host"}] (create-clients "deploy@host"))))
   (deftest test-perform
-	(deftask :test "test-task"
+	(deftask test "test-task"
 	  [a b]
 	  (+ a b))
-	(let [t (:test @tasks)]
+    (let [t (:test @tasks)]
 	  (is (= 7 (perform 1 2 5 t :test '(3 4))))))
   (deftest test-user-at-host?
 	(let [f (user-at-host? "host" "user")]
 	  (is (f {:user "user" :host "host"}))
 	  (is (not (f {:user "hello" :host "host"}))))
-	)
+    )
   (deftest test-set-options!
     (is (nil?  (:ssh-options @@*global-options*)))
     (set-options! :ssh-options "-o ConnectTimeout=3000")
@@ -86,7 +91,7 @@
     (clear-options!))
   (deftest test-find-client-options
 	(let [cluster1 {:ssh-options "-abc" :clients [ {:user "login" :host "a.domain.com" :ssh-options "-def"} ]}
-            cluster2 {:addresses ["a.domain.com"]}]
+          cluster2 {:addresses ["a.domain.com"]}]
 	  (is (= "-abc" (find-client-options "b.domain.com" "login" cluster1 :ssh-options)))
 	  (is (= "-abc" (find-client-options "a.domain.com" "alogin" cluster1 :ssh-options)))
 	  (is (= "-def" (find-client-options "a.domain.com" "login" cluster1 :ssh-options)))
@@ -102,6 +107,18 @@
 (defn myexec
   [h u c]
   (filter not-nil? c))
+
+(with-private-fns [control.core [perform]]
+  (deftest test-once-task
+    (let [c (atom 0)]
+      (deftask hello {:once true} [] (swap! c inc))
+      (deftask call-hello []
+        (call :hello)
+        (call :hello)
+        (call :hello))
+      (perform 1 2 3 (get @tasks :call-hello) :call-hello [])
+      (is (= 1 @c))
+      (is (->> :hello (get @tasks) meta :once)))))
 
 (deftest test-scp
   (binding [exec myexec
